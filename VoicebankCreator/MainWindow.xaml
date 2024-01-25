@@ -16,7 +16,13 @@
 			<Setter Property="Background" Value="Transparent" />
 		</Style>
 	</controls:BackdropWindow.Resources>
-	<StackPanel Orientation="Vertical">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="100" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
 		<ToolBarPanel DockPanel.Dock="Top">
 			<ToolBar
 				x:Name="ToolBar"
@@ -26,5 +32,15 @@
 				<controls:ToolBarButton x:Name="OpenBtn" Icon="&#xe8e5;" Text="{x:Static p:Resources.OpenButton}" Click="OpenBtn_Click" />
 			</ToolBar>
 		</ToolBarPanel>
-	</StackPanel>
+		<MediaElement Name="Player" Grid.Row="1" LoadedBehavior="Manual" Stretch="Uniform" />
+		<Image x:Name="WaveformImage" Grid.Row="2" />
+		<ToolBarPanel DockPanel.Dock="Bottom" Grid.Row="3">
+			<StackPanel Orientation="Horizontal">
+				<Button x:Name="PlayBtn" Content="播放" Click="PlayBtn_Click" />
+				<Button x:Name="PauseBtn" Content="暂停" Click="PauseBtn_Click" />
+				<Button x:Name="StopBtn" Content="停止" Click="StopBtn_Click" />
+				<Button x:Name="PlaySlowBtn" Content="半速播放" Click="PlaySlowBtn_Click" />
+			</StackPanel>
+		</ToolBarPanel>
+	</Grid>
 </controls:BackdropWindow>
