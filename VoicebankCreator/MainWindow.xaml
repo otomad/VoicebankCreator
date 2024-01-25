@@ -1,0 +1,30 @@
+<controls:BackdropWindow
+	x:Class="VoicebankCreator.MainWindow"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:controls="clr-namespace:VoicebankCreator.Controls"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:local="clr-namespace:VoicebankCreator"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:p="clr-namespace:VoicebankCreator.Properties"
+	Title="{x:Static p:Resources.AppTitle}"
+	Width="800"
+	Height="450"
+	mc:Ignorable="d">
+	<controls:BackdropWindow.Resources>
+		<Style TargetType="ToolBar">
+			<Setter Property="Background" Value="Transparent" />
+		</Style>
+	</controls:BackdropWindow.Resources>
+	<StackPanel Orientation="Vertical">
+		<ToolBarPanel DockPanel.Dock="Top">
+			<ToolBar
+				x:Name="ToolBar"
+				Loaded="ToolBar_Loaded"
+				HorizontalAlignment="Stretch"
+				VerticalAlignment="Top">
+				<controls:ToolBarButton x:Name="OpenBtn" Icon="&#xe8e5;" Text="{x:Static p:Resources.OpenButton}" Click="OpenBtn_Click" />
+			</ToolBar>
+		</ToolBarPanel>
+	</StackPanel>
+</controls:BackdropWindow>
