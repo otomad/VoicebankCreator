@@ -15,6 +15,9 @@
 		<Style TargetType="ToolBar">
 			<Setter Property="Background" Value="Transparent" />
 		</Style>
+		<Style TargetType="TextBlock">
+			<Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}" />
+		</Style>
 	</controls:BackdropWindow.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
@@ -32,14 +35,20 @@
 				<controls:ToolBarButton x:Name="OpenBtn" Icon="&#xe8e5;" Text="{x:Static p:Resources.OpenButton}" Click="OpenBtn_Click" />
 			</ToolBar>
 		</ToolBarPanel>
-		<MediaElement Name="Player" Grid.Row="1" LoadedBehavior="Manual" Stretch="Uniform" />
-		<Image x:Name="WaveformImage" Grid.Row="2" />
+		<MediaElement x:Name="Player" Grid.Row="1" ScrubbingEnabled="True" LoadedBehavior="Manual" Stretch="Uniform" />
+		<WindowsFormsHost x:Name="WaveViewerHost" Grid.Row="2">
+			<WindowsFormsHost.Child>
+				<controls:WaveViewer Dock="Fill" />
+			</WindowsFormsHost.Child>
+		</WindowsFormsHost>
+		<!--<Image x:Name="WaveformImage" Grid.Row="2" />-->
 		<ToolBarPanel DockPanel.Dock="Bottom" Grid.Row="3">
 			<StackPanel Orientation="Horizontal">
 				<Button x:Name="PlayBtn" Content="播放" Click="PlayBtn_Click" />
 				<Button x:Name="PauseBtn" Content="暂停" Click="PauseBtn_Click" />
 				<Button x:Name="StopBtn" Content="停止" Click="StopBtn_Click" />
 				<Button x:Name="PlaySlowBtn" Content="半速播放" Click="PlaySlowBtn_Click" />
+				<TextBlock x:Name="CurrentTimeLbl" TextWrapping="Wrap" />
 			</StackPanel>
 		</ToolBarPanel>
 	</Grid>

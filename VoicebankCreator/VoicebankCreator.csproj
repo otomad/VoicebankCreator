@@ -8,6 +8,7 @@
 		<PublishSingleFile>true</PublishSingleFile>
 		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
 		<DebugType>embedded</DebugType>
+		<UseWindowsForms>True</UseWindowsForms>
 	</PropertyGroup>
 
 	<ItemGroup>
