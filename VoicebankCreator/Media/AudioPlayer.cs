@@ -1,17 +1,25 @@
 ﻿using NAudio.Wave.SampleProviders;
 using NAudio.Wave;
+using VoicebankCreator.Helpers;
 
 namespace VoicebankCreator.Media;
 
 public class AudioPlayer {
 	private WaveOutEvent? outputDevice;
+	public AudioFileReader? audio;
+	public AudioFileReader? audioForWaveform;
 	private string? filePath;
 	public string? FilePath {
 		get => filePath;
 		set {
 			filePath = value;
 			outputDevice?.Stop();
-			outputDevice?.Dispose();
+			audio?.Dispose();
+			audioForWaveform?.Dispose();
+			if (filePath != null) {
+				audio = new(filePath);
+				audioForWaveform = new(filePath);
+			}
 		}
 	}
 
@@ -20,11 +28,12 @@ public class AudioPlayer {
 	}
 
 	public void Play(double playbackRate = 1) {
+		if (audio == null) return;
 		new Thread(() => {
 			outputDevice?.Stop();
 			outputDevice = new();
 			IWaveProvider resultAudio;
-			using AudioFileReader audio = new(FilePath);
+			audio.PrepareToReplay();
 			resultAudio = audio;
 			if (playbackRate != 1) {
 				audio.ToWaveProvider16();

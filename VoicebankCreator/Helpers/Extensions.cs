@@ -1,6 +1,8 @@
 using System.Drawing.Imaging;
 using System.IO;
 
+using NAudio.Wave;
+
 namespace VoicebankCreator.Helpers;
 
 internal static class Extensions {
@@ -17,5 +19,9 @@ internal static class Extensions {
 		bitmapImage.Freeze();
 
 		return bitmapImage;
+	}
+
+	public static void PrepareToReplay(this AudioFileReader waveStream) {
+		waveStream.Seek(0, SeekOrigin.Begin);
 	}
 }

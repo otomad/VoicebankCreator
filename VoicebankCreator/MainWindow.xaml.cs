@@ -1,6 +1,6 @@
 using VoicebankCreator.Controls;
 using VoicebankCreator.Helpers;
-//using NAudio.WaveFormRenderer;
+using NAudio.WaveFormRenderer;
 using NAudio.Wave;
 using DrawingColor = System.Drawing.Color;
 using DrawingPen = System.Drawing.Pen;
@@ -8,6 +8,7 @@ using NAudio.Wave.SampleProviders;
 using System.Windows.Threading;
 using VoicebankCreator.Media;
 using System.Numerics;
+using Microsoft.VisualBasic.Devices;
 
 namespace VoicebankCreator;
 
@@ -15,7 +16,7 @@ namespace VoicebankCreator;
 /// Interaction logic for MainWindow.xaml
 /// </summary>
 public partial class MainWindow : BackdropWindow {
-	//private readonly WaveFormRenderer renderer = new();
+	private readonly WaveFormRenderer renderer = new();
 	//private WaveOutEvent? outputDevice;
 	private string? FilePath;
 	private readonly DispatcherTimer timer;
@@ -31,8 +32,35 @@ public partial class MainWindow : BackdropWindow {
 		timer.Start();
 	}
 
+	private readonly static IPeakProvider? peakProvider = new MaxPeakProvider();
+
+	private readonly static StandardWaveFormRendererSettings? myRendererSettings = new() {
+		Width = 640,
+		TopHeight = 32,
+		BottomHeight = 32,
+		BackgroundColor = DrawingColor.Transparent,
+		TopPeakPen = new DrawingPen(DrawingColor.Green),
+		BottomPeakPen = new DrawingPen(DrawingColor.Green),
+	};
+
 	private void Timer_Tick(object? sender, EventArgs e) {
-		CurrentTimeLbl.Text = GetTimecode(Player.Position.TotalSeconds);
+		double current = Player.Position.TotalSeconds;
+		CurrentTimeLbl.Text = GetTimecode(current);
+
+		AudioFileReader? audio = audioPlayer.audioForWaveform;
+		if (audio != null) {
+			audioPlayer.audioForWaveform?.PrepareToReplay();
+			OffsetSampleProvider trimmed = new(audio) {
+				SkipOver = TimeSpan.FromSeconds(current),
+				Take = TimeSpan.FromSeconds(current + 5),
+			};
+			float[] floatBuffer = new float[5 * trimmed.WaveFormat.AverageBytesPerSecond];
+			trimmed.Read(floatBuffer, 0, floatBuffer.Length);
+			byte[] buffer = floatBuffer.SelectMany(f => BitConverter.GetBytes(f)).ToArray();
+			using RawSourceWaveStream newAudio = new(new MemoryStream(buffer), trimmed.WaveFormat);
+			ImageSource image = renderer.Render(newAudio, peakProvider, myRendererSettings).ToImageSource();
+			WaveformImage.Source = image;
+		}
 	}
 	
 	private static string GetTimecode(double seconds) {
@@ -44,8 +72,6 @@ public partial class MainWindow : BackdropWindow {
 		string h = time.ToString("D2");
 		return $"{h}:{m}:{s}";
 	}
-
-	private WaveViewer WaveViewer => (WaveViewer)WaveViewerHost.Child;
 
 	private void OpenBtn_Click(object sender, RoutedEventArgs e) {
 		OpenFileDialog? dialog = new() {
@@ -61,9 +87,6 @@ public partial class MainWindow : BackdropWindow {
 		Player.Source = new Uri(FilePath);
 		Player_ShowFrame();
 		audioPlayer.FilePath = FilePath;
-		WaveViewer.WaveStream = new AudioFileReader(FilePath);
-		WaveViewer.FitToScreen();
-
 	}
 
 	private void Player_ShowFrame() {
