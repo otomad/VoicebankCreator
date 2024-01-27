@@ -51,6 +51,7 @@ public partial class MainWindow : BackdropWindow {
 		if (dialog.ShowDialog() != true) return;
 		FilePath = dialog.FileName;
 
+		rangeZones = new();
 		Player.Source = new Uri(FilePath);
 		Player_ShowFrame();
 	}
@@ -105,6 +106,7 @@ public partial class MainWindow : BackdropWindow {
 	public void Pause() {
 		Player.Pause();
 		IsPlaying = false;
+		DrawWaveform();
 	}
 
 	private void PlayBtn_Click(object? sender, RoutedEventArgs? e) {
@@ -153,6 +155,7 @@ public partial class MainWindow : BackdropWindow {
 		TimeSpan timeSpan = TimeSpan.FromSeconds(Duration);
 		if (writeableBitmap != null)
 			audioPlayer.DrawWaveform(writeableBitmap, Player.Position - timeSpan, Player.Position + timeSpan, SystemParameters.WindowGlassColor);
+		RefreshRangeZonesCanvas();
 	}
 
 	private const string TIME_SPAN_FORMAT = @"hh\:mm\:ss";

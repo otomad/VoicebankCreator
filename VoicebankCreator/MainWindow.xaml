@@ -100,9 +100,11 @@
 				MouseWheel="WaveformOutCanvas_MouseWheel">
 				<Image x:Name="WaveformImage" />
 			</Canvas>
+			<Canvas x:Name="RangeZonesCanvas" />
 			<Line
 				x:Name="CursorLine"
 				Stretch="Fill"
+				IsHitTestVisible="False"
 				Stroke="{DynamicResource ForegroundBrush}"
 				StrokeThickness="2"
 				Visibility="{Binding Path=AudioLoaded, ElementName=mainWindow, Converter={StaticResource BoolToVisibility}}"
