@@ -7,11 +7,13 @@
 	xmlns:local="clr-namespace:VoicebankCreator"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:p="clr-namespace:VoicebankCreator.Properties"
+	x:Name="mainWindow"
 	Title="{x:Static p:Resources.AppTitle}"
 	Width="800"
 	Height="450"
 	SizeChanged="Window_SizeChanged"
 	ThemeChange="Window_ThemeChange"
+	WindowStartupLocation="CenterScreen"
 	mc:Ignorable="d">
 	<c:BackdropWindow.Resources>
 		<Style TargetType="ToolBar">
@@ -20,35 +22,88 @@
 		<Style TargetType="TextBlock">
 			<Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}" />
 		</Style>
+		<BooleanToVisibilityConverter x:Key="BoolToVisibility" />
 	</c:BackdropWindow.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
-			<RowDefinition Height="100" />
 			<RowDefinition Height="Auto" />
+			<RowDefinition Height="100" />
 		</Grid.RowDefinitions>
 		<ToolBarPanel DockPanel.Dock="Top">
 			<ToolBar
 				x:Name="ToolBar"
-				Loaded="ToolBar_Loaded"
+				Grid.Row="0"
 				HorizontalAlignment="Stretch"
-				VerticalAlignment="Top">
-				<c:ToolBarButton x:Name="OpenBtn" Icon="&#xe8e5;" Text="{x:Static p:Resources.OpenButton}" Click="OpenBtn_Click" />
+				VerticalAlignment="Top"
+				Loaded="ToolBar_Loaded">
+				<c:ToolBarButton
+					x:Name="OpenBtn"
+					Click="OpenBtn_Click"
+					Icon="&#xe8e5;"
+					Text="{x:Static p:Resources.OpenButton}" />
+				<Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+				<c:ToolBarButton
+					x:Name="PlayBtn"
+					Click="PlayBtn_Click"
+					Icon="{Binding Path=PlayingCaption.Icon, ElementName=mainWindow}"
+					Text="{Binding Path=PlayingCaption.Name, ElementName=mainWindow}" />
+				<c:ToolBarButton
+					x:Name="StopBtn"
+					Click="StopBtn_Click"
+					Icon="&#xe71a;"
+					Text="{x:Static p:Resources.StopButton}" />
+				<c:ToolBarButton
+					x:Name="PlaySlowBtn"
+					Click="PlaySlowBtn_Click"
+					Icon="&#xe768;"
+					Text="半速播放" />
 			</ToolBar>
 		</ToolBarPanel>
-		<MediaElement Name="Player" Grid.Row="1" ScrubbingEnabled="True" LoadedBehavior="Manual" Stretch="Uniform" MediaEnded="Player_MediaEnded" />
-		<Canvas Grid.Row="2" x:Name="WaveformOutCanvas">
-			<Image x:Name="WaveformImage" />
-		</Canvas>
-		<ToolBarPanel DockPanel.Dock="Bottom" Grid.Row="3">
-			<StackPanel Orientation="Horizontal">
-				<Button x:Name="PlayBtn" Content="播放" Click="PlayBtn_Click" />
-				<Button x:Name="PauseBtn" Content="暂停" Click="PauseBtn_Click" />
-				<Button x:Name="StopBtn" Content="停止" Click="StopBtn_Click" />
-				<Button x:Name="PlaySlowBtn" Content="半速播放" Click="PlaySlowBtn_Click" />
-				<TextBlock x:Name="CurrentTimeLbl" TextWrapping="Wrap" />
-			</StackPanel>
-		</ToolBarPanel>
+		<MediaElement
+			Name="Player"
+			Grid.Row="1"
+			LoadedBehavior="Manual"
+			MediaEnded="Player_MediaEnded"
+			MediaOpened="Player_MediaOpened"
+			ScrubbingEnabled="True"
+			Stretch="Uniform" />
+		<Grid
+			Grid.Row="2"
+			Visibility="{Binding Path=AudioLoaded, ElementName=mainWindow, Converter={StaticResource BoolToVisibility}}">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" MinWidth="64" />
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="Auto" MinWidth="64" />
+			</Grid.ColumnDefinitions>
+			<Grid.Resources>
+				<Style TargetType="TextBlock">
+					<Setter Property="TextAlignment" Value="Center" />
+					<Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}" />
+				</Style>
+			</Grid.Resources>
+			<TextBlock
+				x:Name="CurrentTimeLbl"
+				Grid.Column="0"
+				TextWrapping="Wrap" />
+			<Slider x:Name="CurrentTimeSlider" Grid.Column="1" />
+			<TextBlock
+				x:Name="TotalTimeLbl"
+				Grid.Column="2"
+				TextWrapping="Wrap" />
+		</Grid>
+		<Grid Grid.Row="3">
+			<Canvas x:Name="WaveformOutCanvas" MouseWheel="WaveformOutCanvas_MouseWheel">
+				<Image x:Name="WaveformImage" />
+			</Canvas>
+			<Line
+				Stretch="Fill"
+				Visibility="{Binding Path=AudioLoaded, ElementName=mainWindow, Converter={StaticResource BoolToVisibility}}"
+				Stroke="{DynamicResource ForegroundBrush}"
+				StrokeThickness="2"
+				Y1="0"
+				Y2="1" />
+		</Grid>
 	</Grid>
 </c:BackdropWindow>

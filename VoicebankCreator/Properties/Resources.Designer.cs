@@ -77,5 +77,32 @@ namespace VoicebankCreator.Properties {
                 return ResourceManager.GetString("OpenButton", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   查找类似 _Pause 的本地化字符串。
+        /// </summary>
+        public static string PauseButton {
+            get {
+                return ResourceManager.GetString("PauseButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 _Play 的本地化字符串。
+        /// </summary>
+        public static string PlayButton {
+            get {
+                return ResourceManager.GetString("PlayButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 _Stop 的本地化字符串。
+        /// </summary>
+        public static string StopButton {
+            get {
+                return ResourceManager.GetString("StopButton", resourceCulture);
+            }
+        }
     }
 }

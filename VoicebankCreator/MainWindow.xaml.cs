@@ -2,6 +2,8 @@ using VoicebankCreator.Controls;
 using NAudio.Wave;
 using System.Windows.Threading;
 using VoicebankCreator.Media;
+using System.Numerics;
+using VoicebankCreator.ViewModels;
 
 namespace VoicebankCreator;
 
@@ -16,19 +18,24 @@ public partial class MainWindow : BackdropWindow {
 
 	public MainWindow() {
 		InitializeComponent();
-		timer = new() { Interval = TimeSpan.FromMilliseconds(100) };
+		IsPlaying = false;
+		timer = new() { Interval = TimeSpan.FromMilliseconds(20) };
 		timer.Tick += Timer_Tick;
 		timer.Start();
 		Window_SizeChanged(this, null);
+		CurrentTimeSlider.AddHandler(MouseLeftButtonDownEvent, new MouseButtonEventHandler(CurrentTimeSlider_MouseLeftButtonDown), true);
+		CurrentTimeSlider.AddHandler(MouseLeftButtonUpEvent, new MouseButtonEventHandler(CurrentTimeSlider_MouseLeftButtonUp), true);
 	}
 
 	private void Timer_Tick(object? sender, EventArgs e) {
-		if (!IsPlaying) return;
-
-		UpdateTimeSpan();
-
-		AudioFileReader? audio = audioPlayer.audioForWaveform;
-		if (audio != null && writeableBitmap != null) {
+		if (IsCurrentTimeSliderChanging != IsCurrentTimeSliderChangingState.NoChanging) {
+			CurrentTimeLbl.Text = Player.Position.ToString(TIME_SPAN_FORMAT);
+			Player.IsMuted = true;
+			Player.Position = TimeSpan.FromSeconds(CurrentTimeSlider.Value);
+			Player.IsMuted = false;
+			DrawWaveform();
+		} else if (IsPlaying) {
+			UpdateTimeSpan();
 			DrawWaveform();
 		}
 	}
@@ -46,8 +53,16 @@ public partial class MainWindow : BackdropWindow {
 
 		Player.Source = new Uri(FilePath);
 		Player_ShowFrame();
+	}
+
+	private void Player_MediaOpened(object sender, RoutedEventArgs e) {
+		CurrentTimeSlider.Maximum = PlayerDuration;
+		TotalTimeLbl.Text = Player.NaturalDuration.TimeSpan.ToString(TIME_SPAN_FORMAT);
+		Player_ShowFrame();
 		audioPlayer.FilePath = FilePath;
 		DrawWaveform();
+		duration = 2.5;
+		AudioLoaded = true;
 	}
 
 	private void Player_ShowFrame() {
@@ -64,21 +79,41 @@ public partial class MainWindow : BackdropWindow {
 			mainPanelBorder.Margin = new Thickness();
 	}
 
-	private bool IsPlaying { get; set; } = false;
+	public ToolBarButtonViewModel PlayingCaption { get; } = new();
+	private bool isPlaying = false;
+	private bool IsPlaying {
+		get => isPlaying;
+		set {
+			isPlaying = value;
+			PlayingCaption.Name = isPlaying ? Properties.Resources.PauseButton : Properties.Resources.PlayButton;
+			PlayingCaption.Icon = isPlaying ? "\ue769" : "\ue768";
+		}
+	}
 
-	private void PlayBtn_Click(object? sender, RoutedEventArgs? e) {
+	private bool audioLoaded = false;
+	public bool AudioLoaded {
+		get => audioLoaded;
+		set { audioLoaded = value; OnPropertyChanged(nameof(AudioLoaded)); }
+	}
+
+	public void Play() {
 		//audioPlayer.Play(1);
 		Player.Play();
 		IsPlaying = true;
 	}
 
-	private void PlaySlowBtn_Click(object? sender, RoutedEventArgs? e) {
-		audioPlayer.Play(0.5);
-	}
-
-	private void PauseBtn_Click(object? sender, RoutedEventArgs? e) {
+	public void Pause() {
 		Player.Pause();
 		IsPlaying = false;
+	}
+
+	private void PlayBtn_Click(object? sender, RoutedEventArgs? e) {
+		if (!IsPlaying) Play();
+		else Pause();
+	}
+
+	private void PlaySlowBtn_Click(object? sender, RoutedEventArgs? e) {
+		audioPlayer.Play(0.5);
 	}
 
 	private void StopBtn_Click(object? sender, RoutedEventArgs? e) {
@@ -86,6 +121,7 @@ public partial class MainWindow : BackdropWindow {
 		Player.Stop();
 		Player_ShowFrame();
 		IsPlaying = false;
+		DrawWaveform();
 	}
 
 	private void Window_SizeChanged(object? sender, SizeChangedEventArgs? e) {
@@ -102,20 +138,66 @@ public partial class MainWindow : BackdropWindow {
 		}
 	}
 
-	private void DrawWaveform() {
-		if (writeableBitmap != null)
-			audioPlayer.DrawWaveform(writeableBitmap, SystemParameters.WindowGlassColor);
+	private double PlayerDuration => Player.NaturalDuration.HasTimeSpan ? Player.NaturalDuration.TimeSpan.Seconds : 0;
+
+	private double duration = 2.5;
+	public double Duration {
+		get => duration;
+		set {
+			if (PlayerDuration > 0)
+				duration = Math.Clamp(value, 0.025, PlayerDuration);
+		}
 	}
+
+	private void DrawWaveform() {
+		TimeSpan timeSpan = TimeSpan.FromSeconds(Duration);
+		if (writeableBitmap != null)
+			audioPlayer.DrawWaveform(writeableBitmap, Player.Position - timeSpan, Player.Position + timeSpan, SystemParameters.WindowGlassColor);
+	}
+
+	private const string TIME_SPAN_FORMAT = @"hh\:mm\:ss";
+
+	private enum IsCurrentTimeSliderChangingState {
+		NoChanging,
+		ChangingAfterPausing,
+		ChangingAfterPlaying,
+	}
+
+	private IsCurrentTimeSliderChangingState IsCurrentTimeSliderChanging { get; set; } = IsCurrentTimeSliderChangingState.NoChanging;
 
 	private void UpdateTimeSpan() {
-		CurrentTimeLbl.Text = Player.Position.ToString(@"hh\:mm\:ss");
+		CurrentTimeLbl.Text = Player.Position.ToString(TIME_SPAN_FORMAT);
+		CurrentTimeSlider.Value = Player.Position.TotalSeconds;
 	}
 
-	private void Player_MediaEnded(object sender, RoutedEventArgs e) {
+	private void Player_MediaEnded(object? sender, RoutedEventArgs? e) {
 		IsPlaying = false;
 	}
 
-	private void Window_ThemeChange(object sender, RoutedEventArgs e) {
+	private void Window_ThemeChange(object? sender, RoutedEventArgs? e) {
 		DrawWaveform();
+	}
+
+	private void WaveformOutCanvas_MouseWheel(object? sender, MouseWheelEventArgs e) {
+		bool isZoomIn = e.Delta > 0;
+		Duration *= Math.Pow(0.75, isZoomIn ? 1 : -1);
+		DrawWaveform();
+	}
+
+	private void CurrentTimeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+		IsCurrentTimeSliderChanging = IsPlaying ? IsCurrentTimeSliderChangingState.ChangingAfterPlaying : IsCurrentTimeSliderChangingState.ChangingAfterPausing;
+		Pause();
+		Player.Position = TimeSpan.FromSeconds(e.NewValue);
+	}
+
+	private void CurrentTimeSlider_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
+		IsCurrentTimeSliderChanging = IsPlaying ? IsCurrentTimeSliderChangingState.ChangingAfterPlaying : IsCurrentTimeSliderChangingState.ChangingAfterPausing;
+		Pause();
+	}
+
+	private void CurrentTimeSlider_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
+		if (IsCurrentTimeSliderChanging == IsCurrentTimeSliderChangingState.ChangingAfterPlaying)
+			Play();
+		IsCurrentTimeSliderChanging = IsCurrentTimeSliderChangingState.NoChanging;
 	}
 }

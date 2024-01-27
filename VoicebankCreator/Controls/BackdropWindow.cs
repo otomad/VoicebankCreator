@@ -1,12 +1,13 @@
 using static VoicebankCreator.Interop.PInvoke.ParameterTypes;
 using static VoicebankCreator.Interop.PInvoke.Methods;
+using System.ComponentModel;
 
 namespace VoicebankCreator.Controls;
 
 /// <summary>
 /// BackdropWindow.xaml 的交互逻辑
 /// </summary>
-public partial class BackdropWindow : Window {
+public partial class BackdropWindow : Window, INotifyPropertyChanged {
 	private IntPtr Handle => new WindowInteropHelper(this).Handle;
 
 	public BackdropWindow() {
@@ -80,5 +81,11 @@ public partial class BackdropWindow : Window {
 	public event RoutedEventHandler ThemeChange {
 		add => AddHandler(ThemeChangeEvent, value);
 		remove => RemoveHandler(ThemeChangeEvent, value);
+	}
+
+	public event PropertyChangedEventHandler? PropertyChanged;
+
+	protected virtual void OnPropertyChanged(string propertyName) {
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 }

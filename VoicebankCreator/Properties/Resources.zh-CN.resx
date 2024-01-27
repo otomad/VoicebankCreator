@@ -123,4 +123,13 @@
   <data name="OpenButton" xml:space="preserve">
     <value>打开(_O)</value>
   </data>
+  <data name="PauseButton" xml:space="preserve">
+    <value>暂停(_P)</value>
+  </data>
+  <data name="PlayButton" xml:space="preserve">
+    <value>播放(_P)</value>
+  </data>
+  <data name="StopButton" xml:space="preserve">
+    <value>停止(_S)</value>
+  </data>
 </root>

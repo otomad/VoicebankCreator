@@ -65,11 +65,11 @@ public class AudioPlayer {
 		outputDevice?.Stop();
 	}
 
-	public void DrawWaveform(WriteableBitmap wBitmap, System.Windows.Media.Color? color = null) {
-		DrawWaveform(wBitmap, color.ToDrawingColor());
+	public void DrawWaveform(WriteableBitmap wBitmap, TimeSpan left, TimeSpan right, System.Windows.Media.Color? color = null) {
+		DrawWaveform(wBitmap, left, right, color.ToDrawingColor());
 	}
 
-	public void DrawWaveform(WriteableBitmap wBitmap, Color? color = null) {
+	public void DrawWaveform(WriteableBitmap wBitmap, TimeSpan left, TimeSpan right, Color? color = null) {
 		color ??= Color.Green;
 		if (audioForWaveform == null) return;
 		audioForWaveform.PrepareToReplay();
@@ -87,15 +87,16 @@ public class AudioPlayer {
 		graphics.Clear(Color.Transparent);
 		Pen pen = new(color.Value);
 
-		int size = data.Length / 4;
+		double length = data.Length / 4.0;
+		double size = length / (audioForWaveform.TotalTime / (right - left));
+		int leftOffset = (int)(left / audioForWaveform.TotalTime * length);
 		for (int iPixel = 0; iPixel < width; iPixel++) {
 			// determine start and end points within WAV
-			int start = (int)(iPixel * ((float)size / width));
-			int end = (int)((iPixel + 1) * ((float)size / width));
-			float min = float.MaxValue;
-			float max = float.MinValue;
+			int start = (int)(iPixel * (size / width));
+			int end = (int)((iPixel + 1) * (size / width));
+			float min = float.MaxValue, max = float.MinValue;
 			for (int i = start; i < end; i++) {
-				float val = data[i];
+				float val = data.ElementAtOrDefault(i + leftOffset);
 				min = val < min ? val : min;
 				max = val > max ? val : max;
 			}
