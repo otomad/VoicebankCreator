@@ -61,8 +61,14 @@ public partial class MainWindow {
 
 	private void SubmitCreateRangeZone() {
 		if (ActiveRangeZone == null) return;
+		if (ActiveRangeZone.ActualWidth < 3) {
+			RangeZonesCanvas.Children.Remove(ActiveRangeZone);
+			ActiveRangeZone = null;
+			return;
+		}
 		ActiveRangeZone.IsHitTestVisible = true;
 		ActiveRangeZone.Resize += RangeZone_Resize;
+		ActiveRangeZone.MouseLeftButtonDown += RangeZone_MouseLeftButtonDown;
 		UpdateRangeZoneSeconds(ActiveRangeZone);
 		rangeZones.Add(ActiveRangeZone);
 		RefreshRangeZonesCanvas();
@@ -97,7 +103,11 @@ public partial class MainWindow {
 		RangeZonesCanvas.Children.RemoveRange(0, RangeZonesCanvas.Children.Count);
 		double widthPixel = RangeZonesCanvas.ActualWidth;
 		foreach (RangeZone rangeZone in rangeZones) {
-			RangeZonesCanvas.Children.Add(rangeZone);
+			try {
+				RangeZonesCanvas.Children.Add(rangeZone);
+			} catch (Exception) {
+				continue;
+			}
 			rangeZone.Width = rangeZone.LengthSeconds / (Duration * 2) * widthPixel;
 			Canvas.SetLeft(rangeZone, (rangeZone.StartSeconds - Player.Position.TotalSeconds + Duration) / (Duration * 2) * widthPixel);
 		}
@@ -106,7 +116,26 @@ public partial class MainWindow {
 
 	private List<RangeZone> rangeZones = new();
 
-	private RangeZone? ActiveRangeZone { get; set; }
+	private RangeZone? activeRangeZone;
+	private RangeZone? ActiveRangeZone {
+		get => activeRangeZone;
+		set {
+			if (activeRangeZone != null)
+				activeRangeZone.IsActive = false;
+			activeRangeZone = value;
+			if (activeRangeZone != null)
+				activeRangeZone.IsActive = true;
+			OnPropertyChanged(nameof(HasRangeZoneSelected));
+		}
+	}
+
+	private bool HasRangeZoneSelected {
+		get => ActiveRangeZone != null;
+		set => OnPropertyChanged(nameof(HasRangeZoneSelected));
+	} // TODO: BUG
+
+	private void RangeZone_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) =>
+		ActiveRangeZone = sender as RangeZone;
 
 	private void WaveformOutCanvas_MouseMove(object sender, MouseEventArgs e) {
 		if (CursorLine.Visibility == Visibility.Visible && waveformMoveStartPosition.HasValue) {

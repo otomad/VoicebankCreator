@@ -114,8 +114,10 @@ public partial class MainWindow : BackdropWindow {
 		else Pause();
 	}
 
-	private void PlaySlowBtn_Click(object? sender, RoutedEventArgs? e) {
-		audioPlayer.Play(0.5);
+	private void PlaySelectedBtn_Click(object? sender, RoutedEventArgs? e) {
+		double playbackRate = sender == PlaySelectedBtn ? 1 : 0.5;
+		if (ActiveRangeZone != null)
+			audioPlayer.Play(playbackRate, ActiveRangeZone.StartSeconds, ActiveRangeZone.LengthSeconds);
 	}
 
 	private void StopBtn_Click(object? sender, RoutedEventArgs? e) {
@@ -190,5 +192,17 @@ public partial class MainWindow : BackdropWindow {
 		if (IsCurrentTimeSliderChanging == IsCurrentTimeSliderChangingState.ChangingAfterPlaying)
 			Play();
 		IsCurrentTimeSliderChanging = IsCurrentTimeSliderChangingState.NoChanging;
+	}
+
+	private void RemoveSelectedBtn_Click(object sender, RoutedEventArgs e) {
+		if (ActiveRangeZone == null) return;
+		RangeZonesCanvas.Children.Remove(ActiveRangeZone);
+		rangeZones.Remove(ActiveRangeZone);
+		ActiveRangeZone = null;
+	}
+
+	private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+		StopBtn_Click(null, null);
+		audioPlayer.FilePath = null;
 	}
 }

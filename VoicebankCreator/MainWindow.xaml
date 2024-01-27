@@ -7,13 +7,14 @@
 	xmlns:local="clr-namespace:VoicebankCreator"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:p="clr-namespace:VoicebankCreator.Properties"
-	x:Name="mainWindow"
+	x:Name="Me"
 	Title="{x:Static p:Resources.AppTitle}"
 	Width="800"
 	Height="450"
 	SizeChanged="Window_SizeChanged"
 	ThemeChange="Window_ThemeChange"
 	WindowStartupLocation="CenterScreen"
+	Closing="Window_Closing"
 	mc:Ignorable="d">
 	<c:BackdropWindow.Resources>
 		<Style TargetType="ToolBar">
@@ -47,18 +48,31 @@
 				<c:ToolBarButton
 					x:Name="PlayBtn"
 					Click="PlayBtn_Click"
-					Icon="{Binding Path=PlayingCaption.Icon, ElementName=mainWindow}"
-					Text="{Binding Path=PlayingCaption.Name, ElementName=mainWindow}" />
+					Icon="{Binding Path=PlayingCaption.Icon, ElementName=Me}"
+					Text="{Binding Path=PlayingCaption.Name, ElementName=Me}" />
 				<c:ToolBarButton
 					x:Name="StopBtn"
 					Click="StopBtn_Click"
 					Icon="&#xe71a;"
 					Text="{x:Static p:Resources.StopButton}" />
 				<c:ToolBarButton
-					x:Name="PlaySlowBtn"
-					Click="PlaySlowBtn_Click"
+					x:Name="PlaySelectedBtn"
+					Click="PlaySelectedBtn_Click"
 					Icon="&#xe768;"
-					Text="半速播放" />
+					IsEnabled="{Binding Path=HasRangeZoneSelected, ElementName=Me}"
+					Text="播放选中" />
+				<c:ToolBarButton
+					x:Name="PlaySelectedSlowBtn"
+					Click="PlaySelectedBtn_Click"
+					Icon="&#xe768;"
+					IsEnabled="{Binding Path=HasRangeZoneSelected, ElementName=Me}"
+					Text="半速播放选中" />
+				<c:ToolBarButton
+					x:Name="RemoveSelectedBtn"
+					Click="RemoveSelectedBtn_Click"
+					Icon="&#xe74d;"
+					IsEnabled="{Binding Path=HasRangeZoneSelected, ElementName=Me}"
+					Text="删除选中" />
 			</ToolBar>
 		</ToolBarPanel>
 		<MediaElement
@@ -69,7 +83,7 @@
 			MediaOpened="Player_MediaOpened"
 			ScrubbingEnabled="True"
 			Stretch="Uniform" />
-		<Grid Grid.Row="2" Visibility="{Binding Path=AudioLoaded, ElementName=mainWindow, Converter={StaticResource BoolToVisibility}}">
+		<Grid Grid.Row="2" Visibility="{Binding Path=AudioLoaded, ElementName=Me, Converter={StaticResource BoolToVisibility}}">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto" MinWidth="64" />
 				<ColumnDefinition Width="*" />
@@ -103,11 +117,11 @@
 			<Canvas x:Name="RangeZonesCanvas" />
 			<Line
 				x:Name="CursorLine"
-				Stretch="Fill"
 				IsHitTestVisible="False"
+				Stretch="Fill"
 				Stroke="{DynamicResource ForegroundBrush}"
 				StrokeThickness="2"
-				Visibility="{Binding Path=AudioLoaded, ElementName=mainWindow, Converter={StaticResource BoolToVisibility}}"
+				Visibility="{Binding Path=AudioLoaded, ElementName=Me, Converter={StaticResource BoolToVisibility}}"
 				Y1="0"
 				Y2="1" />
 		</Grid>

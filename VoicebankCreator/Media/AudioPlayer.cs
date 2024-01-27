@@ -30,23 +30,31 @@ public class AudioPlayer {
 		FilePath = filePath;
 	}
 
-	public void Play(double playbackRate = 1) {
+	public void Play(double playbackRate = 1, double start = -1, double length = -1) {
 		if (audio == null) return;
 		new Thread(() => {
 			outputDevice?.Stop();
 			outputDevice = new();
-			IWaveProvider resultAudio;
+			ISampleProvider resultAudio;
 			audio.PrepareToReplay();
 			resultAudio = audio;
+
+			if (start > 0 && length > 0) {
+				OffsetSampleProvider slice = new(resultAudio) {
+					SkipOver = TimeSpan.FromSeconds(start),
+					Take = TimeSpan.FromSeconds(length),
+				};
+				resultAudio = slice;
+			}
+
 			if (playbackRate != 1) {
-				audio.ToWaveProvider16();
-				SampleToWaveProvider16 wave16 = new(audio);
+				SampleToWaveProvider16 wave16 = new(resultAudio);
 				WaveFormat format = new((int)(wave16.WaveFormat.SampleRate * playbackRate), wave16.WaveFormat.BitsPerSample, wave16.WaveFormat.Channels);
 
 				byte[] buffer = new byte[audio.Length];
 				wave16.Read(buffer, 0, buffer.Length);
 				using RawSourceWaveStream newAudio = new(new MemoryStream(buffer), format);
-				resultAudio = newAudio;
+				resultAudio = newAudio.ToSampleProvider();
 			}
 
 			outputDevice.Init(resultAudio);

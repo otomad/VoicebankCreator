@@ -63,4 +63,13 @@ public partial class RangeZone : UserControl {
 			CurrentPosition = currentPosition / dpi;
 		}
 	}
+
+	private bool isActive = false;
+	public bool IsActive {
+		get => isActive;
+		set {
+			isActive = value;
+			Resources["FillColor"] = isActive ? Color.FromRgb(255, 128, 0) : Color.FromRgb(0, 128, 255);
+		}
+	}
 }

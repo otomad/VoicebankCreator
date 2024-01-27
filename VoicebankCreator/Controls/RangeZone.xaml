@@ -8,11 +8,21 @@
 	d:DesignHeight="100"
 	d:DesignWidth="200"
 	mc:Ignorable="d">
+	<UserControl.Resources>
+		<Color x:Key="FillColor">#FF0080FF</Color>
+	</UserControl.Resources>
 	<Border
-		Background="#4C0080FF"
-		BorderBrush="#FF0080FF"
 		BorderThickness="1"
 		CornerRadius="3">
+		<Border.Background>
+			<SolidColorBrush Opacity="0.2" Color="{DynamicResource FillColor}" />
+		</Border.Background>
+		<Border.BorderBrush>
+			<RadialGradientBrush>
+				<GradientStop Color="{DynamicResource FillColor}"/>
+				<GradientStop Color="{DynamicResource FillColor}"/>
+			</RadialGradientBrush>
+		</Border.BorderBrush>
 		<Grid>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="8" />
