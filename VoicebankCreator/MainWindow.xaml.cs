@@ -25,23 +25,12 @@ public partial class MainWindow : BackdropWindow {
 	private void Timer_Tick(object? sender, EventArgs e) {
 		if (!IsPlaying) return;
 
-		double current = Player.Position.TotalSeconds;
-		CurrentTimeLbl.Text = GetTimecode(current);
+		UpdateTimeSpan();
 
 		AudioFileReader? audio = audioPlayer.audioForWaveform;
 		if (audio != null && writeableBitmap != null) {
 			DrawWaveform();
 		}
-	}
-	
-	private static string GetTimecode(double seconds) {
-		long time = (long)Math.Floor(seconds);
-		string s = (time % 60).ToString("D2");
-		time /= 60;
-		string m = (time % 60).ToString("D2");
-		time /= 60;
-		string h = time.ToString("D2");
-		return $"{h}:{m}:{s}";
 	}
 
 	private void OpenBtn_Click(object? sender, RoutedEventArgs? e) {
@@ -64,6 +53,7 @@ public partial class MainWindow : BackdropWindow {
 	private void Player_ShowFrame() {
 		Player.Play();
 		Player.Pause();
+		UpdateTimeSpan();
 	}
 
 	private void ToolBar_Loaded(object sender, RoutedEventArgs? e) {
@@ -115,6 +105,10 @@ public partial class MainWindow : BackdropWindow {
 	private void DrawWaveform() {
 		if (writeableBitmap != null)
 			audioPlayer.DrawWaveform(writeableBitmap, SystemParameters.WindowGlassColor);
+	}
+
+	private void UpdateTimeSpan() {
+		CurrentTimeLbl.Text = Player.Position.ToString(@"hh\:mm\:ss");
 	}
 
 	private void Player_MediaEnded(object sender, RoutedEventArgs e) {

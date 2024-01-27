@@ -4,7 +4,6 @@ using System.Drawing;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
 using Color = System.Drawing.Color;
 using Pen = System.Drawing.Pen;
-using System.Windows.Media.Imaging;
 
 namespace VoicebankCreator.Media;
 
