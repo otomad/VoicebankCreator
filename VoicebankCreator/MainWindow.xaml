@@ -69,9 +69,7 @@
 			MediaOpened="Player_MediaOpened"
 			ScrubbingEnabled="True"
 			Stretch="Uniform" />
-		<Grid
-			Grid.Row="2"
-			Visibility="{Binding Path=AudioLoaded, ElementName=mainWindow, Converter={StaticResource BoolToVisibility}}">
+		<Grid Grid.Row="2" Visibility="{Binding Path=AudioLoaded, ElementName=mainWindow, Converter={StaticResource BoolToVisibility}}">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto" MinWidth="64" />
 				<ColumnDefinition Width="*" />
@@ -94,14 +92,20 @@
 				TextWrapping="Wrap" />
 		</Grid>
 		<Grid Grid.Row="3">
-			<Canvas x:Name="WaveformOutCanvas" MouseWheel="WaveformOutCanvas_MouseWheel">
+			<Canvas
+				x:Name="WaveformOutCanvas"
+				MouseDown="WaveformOutCanvas_MouseDown"
+				MouseMove="WaveformOutCanvas_MouseMove"
+				MouseUp="WaveformOutCanvas_MouseUp"
+				MouseWheel="WaveformOutCanvas_MouseWheel">
 				<Image x:Name="WaveformImage" />
 			</Canvas>
 			<Line
+				x:Name="CursorLine"
 				Stretch="Fill"
-				Visibility="{Binding Path=AudioLoaded, ElementName=mainWindow, Converter={StaticResource BoolToVisibility}}"
 				Stroke="{DynamicResource ForegroundBrush}"
 				StrokeThickness="2"
+				Visibility="{Binding Path=AudioLoaded, ElementName=mainWindow, Converter={StaticResource BoolToVisibility}}"
 				Y1="0"
 				Y2="1" />
 		</Grid>

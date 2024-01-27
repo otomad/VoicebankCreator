@@ -29,11 +29,11 @@ public partial class MainWindow : BackdropWindow {
 
 	private void Timer_Tick(object? sender, EventArgs e) {
 		if (IsCurrentTimeSliderChanging != IsCurrentTimeSliderChangingState.NoChanging) {
-			CurrentTimeLbl.Text = Player.Position.ToString(TIME_SPAN_FORMAT);
 			Player.IsMuted = true;
+			CurrentTimeLbl.Text = Player.Position.ToString(TIME_SPAN_FORMAT);
 			Player.Position = TimeSpan.FromSeconds(CurrentTimeSlider.Value);
-			Player.IsMuted = false;
 			DrawWaveform();
+			Player.IsMuted = false;
 		} else if (IsPlaying) {
 			UpdateTimeSpan();
 			DrawWaveform();
@@ -178,24 +178,12 @@ public partial class MainWindow : BackdropWindow {
 		DrawWaveform();
 	}
 
-	private void WaveformOutCanvas_MouseWheel(object? sender, MouseWheelEventArgs e) {
-		bool isZoomIn = e.Delta > 0;
-		Duration *= Math.Pow(0.75, isZoomIn ? 1 : -1);
-		DrawWaveform();
-	}
-
-	private void CurrentTimeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
-		IsCurrentTimeSliderChanging = IsPlaying ? IsCurrentTimeSliderChangingState.ChangingAfterPlaying : IsCurrentTimeSliderChangingState.ChangingAfterPausing;
-		Pause();
-		Player.Position = TimeSpan.FromSeconds(e.NewValue);
-	}
-
-	private void CurrentTimeSlider_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
+	private void CurrentTimeSlider_MouseLeftButtonDown(object? sender, MouseButtonEventArgs? e) {
 		IsCurrentTimeSliderChanging = IsPlaying ? IsCurrentTimeSliderChangingState.ChangingAfterPlaying : IsCurrentTimeSliderChangingState.ChangingAfterPausing;
 		Pause();
 	}
 
-	private void CurrentTimeSlider_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
+	private void CurrentTimeSlider_MouseLeftButtonUp(object? sender, MouseButtonEventArgs? e) {
 		if (IsCurrentTimeSliderChanging == IsCurrentTimeSliderChangingState.ChangingAfterPlaying)
 			Play();
 		IsCurrentTimeSliderChanging = IsCurrentTimeSliderChangingState.NoChanging;
