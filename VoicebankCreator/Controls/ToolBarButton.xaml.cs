@@ -1,4 +1,4 @@
-﻿namespace VoicebankCreator.Controls;
+namespace VoicebankCreator.Controls;
 
 /// <summary>
 /// ToolBarButton.xaml 的交互逻辑

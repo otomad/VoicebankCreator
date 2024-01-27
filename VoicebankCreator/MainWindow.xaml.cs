@@ -1,14 +1,7 @@
 using VoicebankCreator.Controls;
-using VoicebankCreator.Helpers;
-using NAudio.WaveFormRenderer;
 using NAudio.Wave;
-using DrawingColor = System.Drawing.Color;
-using DrawingPen = System.Drawing.Pen;
-using NAudio.Wave.SampleProviders;
 using System.Windows.Threading;
 using VoicebankCreator.Media;
-using System.Numerics;
-using Microsoft.VisualBasic.Devices;
 
 namespace VoicebankCreator;
 
@@ -16,50 +9,28 @@ namespace VoicebankCreator;
 /// Interaction logic for MainWindow.xaml
 /// </summary>
 public partial class MainWindow : BackdropWindow {
-	private readonly WaveFormRenderer renderer = new();
-	//private WaveOutEvent? outputDevice;
 	private string? FilePath;
 	private readonly DispatcherTimer timer;
 	private readonly AudioPlayer audioPlayer = new();
-	//private AudioFileReader? audio;
+	private WriteableBitmap? writeableBitmap;
 
 	public MainWindow() {
 		InitializeComponent();
-		timer = new() {
-			Interval = TimeSpan.FromMilliseconds(100)
-		};
+		timer = new() { Interval = TimeSpan.FromMilliseconds(100) };
 		timer.Tick += Timer_Tick;
 		timer.Start();
+		Window_SizeChanged(this, null);
 	}
 
-	private readonly static IPeakProvider? peakProvider = new MaxPeakProvider();
-
-	private readonly static StandardWaveFormRendererSettings? myRendererSettings = new() {
-		Width = 640,
-		TopHeight = 32,
-		BottomHeight = 32,
-		BackgroundColor = DrawingColor.Transparent,
-		TopPeakPen = new DrawingPen(DrawingColor.Green),
-		BottomPeakPen = new DrawingPen(DrawingColor.Green),
-	};
-
 	private void Timer_Tick(object? sender, EventArgs e) {
+		if (!IsPlaying) return;
+
 		double current = Player.Position.TotalSeconds;
 		CurrentTimeLbl.Text = GetTimecode(current);
 
 		AudioFileReader? audio = audioPlayer.audioForWaveform;
-		if (audio != null) {
-			audioPlayer.audioForWaveform?.PrepareToReplay();
-			OffsetSampleProvider trimmed = new(audio) {
-				SkipOver = TimeSpan.FromSeconds(current),
-				Take = TimeSpan.FromSeconds(current + 5),
-			};
-			float[] floatBuffer = new float[5 * trimmed.WaveFormat.AverageBytesPerSecond];
-			trimmed.Read(floatBuffer, 0, floatBuffer.Length);
-			byte[] buffer = floatBuffer.SelectMany(f => BitConverter.GetBytes(f)).ToArray();
-			using RawSourceWaveStream newAudio = new(new MemoryStream(buffer), trimmed.WaveFormat);
-			ImageSource image = renderer.Render(newAudio, peakProvider, myRendererSettings).ToImageSource();
-			WaveformImage.Source = image;
+		if (audio != null && writeableBitmap != null) {
+			DrawWaveform();
 		}
 	}
 	
@@ -73,12 +44,12 @@ public partial class MainWindow : BackdropWindow {
 		return $"{h}:{m}:{s}";
 	}
 
-	private void OpenBtn_Click(object sender, RoutedEventArgs e) {
+	private void OpenBtn_Click(object? sender, RoutedEventArgs? e) {
 		OpenFileDialog? dialog = new() {
-			Filter = "All supported files|*.yml;*.yaml;*.mp4;*.mov;*.m4v;*.wmv;*.asf;*.avi;*.3g2;*.3gp;*.3gp2;*.3gpp;*.wav;*.aiff;*.mp3;*.wma;*.aac;*.m4a;*.adts;*.ogg;*.flac|" +
+			Filter = "All supported files|*.yml;*.yaml;*.mp4;*.mov;*.m4v;*.wmv;*.asf;*.avi;*.3g2;*.3gp;*.3gp2;*.3gpp;*.wav;*.aiff;*.mp3;*.wma;*.aac;*.m4a;*.adts;*.flac|" +
 				"YAML files|*.yml;*.yaml|" +
 				"Video files|*.mp4;*.mov;*.m4v;*.wmv;*.asf;*.avi;*.3g2;*.3gp;*.3gp2;*.3gpp|" +
-				"Audio files|*.wav;*.aiff;*.mp3;*.wma;*.aac;*.m4a;*.adts;*.ogg;*.flac|" +
+				"Audio files|*.wav;*.aiff;*.mp3;*.wma;*.aac;*.m4a;*.adts;*.flac|" +
 				"All files|*.*",
 		};
 		if (dialog.ShowDialog() != true) return;
@@ -87,6 +58,7 @@ public partial class MainWindow : BackdropWindow {
 		Player.Source = new Uri(FilePath);
 		Player_ShowFrame();
 		audioPlayer.FilePath = FilePath;
+		DrawWaveform();
 	}
 
 	private void Player_ShowFrame() {
@@ -94,7 +66,7 @@ public partial class MainWindow : BackdropWindow {
 		Player.Pause();
 	}
 
-	private void ToolBar_Loaded(object sender, RoutedEventArgs e) {
+	private void ToolBar_Loaded(object sender, RoutedEventArgs? e) {
 		ToolBar toolBar = (ToolBar)sender;
 		if (toolBar.Template.FindName("OverflowGrid", toolBar) is FrameworkElement overflowGrid)
 			overflowGrid.Visibility = Visibility.Collapsed;
@@ -102,22 +74,54 @@ public partial class MainWindow : BackdropWindow {
 			mainPanelBorder.Margin = new Thickness();
 	}
 
-	private void PlayBtn_Click(object sender, RoutedEventArgs e) {
+	private bool IsPlaying { get; set; } = false;
+
+	private void PlayBtn_Click(object? sender, RoutedEventArgs? e) {
 		//audioPlayer.Play(1);
 		Player.Play();
+		IsPlaying = true;
 	}
 
-	private void PlaySlowBtn_Click(object sender, RoutedEventArgs e) {
+	private void PlaySlowBtn_Click(object? sender, RoutedEventArgs? e) {
 		audioPlayer.Play(0.5);
 	}
 
-	private void PauseBtn_Click(object sender, RoutedEventArgs e) {
+	private void PauseBtn_Click(object? sender, RoutedEventArgs? e) {
 		Player.Pause();
+		IsPlaying = false;
 	}
 
-	private void StopBtn_Click(object sender, RoutedEventArgs e) {
+	private void StopBtn_Click(object? sender, RoutedEventArgs? e) {
 		audioPlayer.Stop();
 		Player.Stop();
 		Player_ShowFrame();
+		IsPlaying = false;
+	}
+
+	private void Window_SizeChanged(object? sender, SizeChangedEventArgs? e) {
+		if (e != null && e.PreviousSize.Width == e.NewSize.Width) return;
+		int width = (int)WaveformOutCanvas.ActualWidth;
+		int height = (int)WaveformOutCanvas.ActualHeight;
+		if (width > 0 && height > 0) {
+			WaveformImage.Width = width;
+			WaveformImage.Height = height;
+			const int DPI = 96;
+			writeableBitmap = new WriteableBitmap(width, height, DPI, DPI, PixelFormats.Bgra32, null);
+			WaveformImage.Source = writeableBitmap;
+			DrawWaveform();
+		}
+	}
+
+	private void DrawWaveform() {
+		if (writeableBitmap != null)
+			audioPlayer.DrawWaveform(writeableBitmap, SystemParameters.WindowGlassColor);
+	}
+
+	private void Player_MediaEnded(object sender, RoutedEventArgs e) {
+		IsPlaying = false;
+	}
+
+	private void Window_ThemeChange(object sender, RoutedEventArgs e) {
+		DrawWaveform();
 	}
 }

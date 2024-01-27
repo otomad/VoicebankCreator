@@ -1,4 +1,4 @@
-﻿global using System;
+global using System;
 global using System.Collections.Generic;
 global using System.Diagnostics;
 global using System.Globalization;
@@ -21,3 +21,5 @@ global using System.Windows.Navigation;
 global using System.Windows.Shapes;
 
 global using Microsoft.Win32;
+
+global using VoicebankCreator.Helpers;

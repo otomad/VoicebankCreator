@@ -10,6 +10,8 @@
 	Title="{x:Static p:Resources.AppTitle}"
 	Width="800"
 	Height="450"
+	SizeChanged="Window_SizeChanged"
+	ThemeChange="Window_ThemeChange"
 	mc:Ignorable="d">
 	<controls:BackdropWindow.Resources>
 		<Style TargetType="ToolBar">
@@ -35,8 +37,10 @@
 				<controls:ToolBarButton x:Name="OpenBtn" Icon="&#xe8e5;" Text="{x:Static p:Resources.OpenButton}" Click="OpenBtn_Click" />
 			</ToolBar>
 		</ToolBarPanel>
-		<MediaElement Name="Player" Grid.Row="1" ScrubbingEnabled="True" LoadedBehavior="Manual" Stretch="Uniform" />
-		<Image x:Name="WaveformImage" Grid.Row="2" />
+		<MediaElement Name="Player" Grid.Row="1" ScrubbingEnabled="True" LoadedBehavior="Manual" Stretch="Uniform" MediaEnded="Player_MediaEnded" />
+		<Canvas Grid.Row="2" x:Name="WaveformOutCanvas">
+			<Image x:Name="WaveformImage" />
+		</Canvas>
 		<ToolBarPanel DockPanel.Dock="Bottom" Grid.Row="3">
 			<StackPanel Orientation="Horizontal">
 				<Button x:Name="PlayBtn" Content="播放" Click="PlayBtn_Click" />

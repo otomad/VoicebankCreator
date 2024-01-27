@@ -24,4 +24,8 @@ internal static class Extensions {
 	public static void PrepareToReplay(this AudioFileReader waveStream) {
 		waveStream.Seek(0, SeekOrigin.Begin);
 	}
+
+	public static System.Drawing.Color? ToDrawingColor(this Color? mediaColor) =>
+		mediaColor == null ? null :
+			System.Drawing.Color.FromArgb(mediaColor.Value.A, mediaColor.Value.R, mediaColor.Value.G, mediaColor.Value.B);
 }

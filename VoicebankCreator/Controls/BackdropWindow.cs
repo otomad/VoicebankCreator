@@ -1,4 +1,4 @@
-﻿using static VoicebankCreator.Interop.PInvoke.ParameterTypes;
+using static VoicebankCreator.Interop.PInvoke.ParameterTypes;
 using static VoicebankCreator.Interop.PInvoke.Methods;
 
 namespace VoicebankCreator.Controls;
@@ -50,8 +50,10 @@ public partial class BackdropWindow : Window {
 		source.AddHook((IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) => {
 			const int WM_SETTINGCHANGE = 0x001A;
 			if (msg == WM_SETTINGCHANGE)
-				if (wParam == IntPtr.Zero && Marshal.PtrToStringUni(lParam) == "ImmersiveColorSet")
+				if (wParam == IntPtr.Zero && Marshal.PtrToStringUni(lParam) == "ImmersiveColorSet") {
 					RefreshDarkMode();
+					RaiseEvent(new RoutedEventArgs(ThemeChangeEvent, this));
+				}
 			return IntPtr.Zero;
 		});
 	}
@@ -70,5 +72,13 @@ public partial class BackdropWindow : Window {
 
 	private void SetSystemBackdropType(DWM_SYSTEMBACKDROP_TYPE systemBackdropType) {
 		SetWindowAttribute(Handle, DWMWINDOWATTRIBUTE.DWMWA_SYSTEMBACKDROP_TYPE, (int)systemBackdropType);
+	}
+
+	private static readonly RoutedEvent ThemeChangeEvent =
+		EventManager.RegisterRoutedEvent("ThemeChange", RoutingStrategy.Bubble, typeof(EventHandler<RoutedEventArgs>), typeof(BackdropWindow));
+
+	public event RoutedEventHandler ThemeChange {
+		add => AddHandler(ThemeChangeEvent, value);
+		remove => RemoveHandler(ThemeChangeEvent, value);
 	}
 }
