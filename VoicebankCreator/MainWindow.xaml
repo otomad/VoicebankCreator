@@ -11,10 +11,10 @@
 	Title="{x:Static p:Resources.AppTitle}"
 	Width="800"
 	Height="450"
+	Closing="Window_Closing"
 	SizeChanged="Window_SizeChanged"
 	ThemeChange="Window_ThemeChange"
 	WindowStartupLocation="CenterScreen"
-	Closing="Window_Closing"
 	mc:Ignorable="d">
 	<c:BackdropWindow.Resources>
 		<Style TargetType="ToolBar">
@@ -55,6 +55,7 @@
 					Click="StopBtn_Click"
 					Icon="&#xe71a;"
 					Text="{x:Static p:Resources.StopButton}" />
+				<Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
 				<c:ToolBarButton
 					x:Name="PlaySelectedBtn"
 					Click="PlaySelectedBtn_Click"
@@ -64,7 +65,7 @@
 				<c:ToolBarButton
 					x:Name="PlaySelectedSlowBtn"
 					Click="PlaySelectedBtn_Click"
-					Icon="&#xe768;"
+					Icon="&#xec57;"
 					IsEnabled="{Binding Path=HasRangeZoneSelected, ElementName=Me}"
 					Text="半速播放选中" />
 				<c:ToolBarButton
@@ -82,7 +83,8 @@
 			MediaEnded="Player_MediaEnded"
 			MediaOpened="Player_MediaOpened"
 			ScrubbingEnabled="True"
-			Stretch="Uniform" />
+			Stretch="Uniform"
+			Volume="1" />
 		<Grid Grid.Row="2" Visibility="{Binding Path=AudioLoaded, ElementName=Me, Converter={StaticResource BoolToVisibility}}">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto" MinWidth="64" />
@@ -105,13 +107,16 @@
 				Grid.Column="2"
 				TextWrapping="Wrap" />
 		</Grid>
-		<Grid Grid.Row="3">
+		<Grid
+			Grid.Row="3"
+			MouseDown="WaveformOutCanvas_MiddleMouseDown"
+			MouseMove="WaveformOutCanvas_MouseMove"
+			MouseUp="WaveformOutCanvas_MiddleMouseUp"
+			MouseWheel="WaveformOutCanvas_MouseWheel">
 			<Canvas
 				x:Name="WaveformOutCanvas"
-				MouseDown="WaveformOutCanvas_MouseDown"
-				MouseMove="WaveformOutCanvas_MouseMove"
-				MouseUp="WaveformOutCanvas_MouseUp"
-				MouseWheel="WaveformOutCanvas_MouseWheel">
+				MouseDown="WaveformOutCanvas_LeftMouseDown"
+				MouseUp="WaveformOutCanvas_LeftMouseUp">
 				<Image x:Name="WaveformImage" />
 			</Canvas>
 			<Canvas x:Name="RangeZonesCanvas" />

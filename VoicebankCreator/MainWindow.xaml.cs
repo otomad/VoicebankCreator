@@ -51,7 +51,7 @@ public partial class MainWindow : BackdropWindow {
 		if (dialog.ShowDialog() != true) return;
 		FilePath = dialog.FileName;
 
-		rangeZones = new();
+		ClearAllRangeZones();
 		Player.Source = new Uri(FilePath);
 		Player_ShowFrame();
 	}

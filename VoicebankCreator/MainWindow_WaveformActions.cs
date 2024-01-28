@@ -21,7 +21,7 @@ public partial class MainWindow {
 	/// </summary>
 	private bool isDeferredMovingStarted = false;
 
-	private void WaveformOutCanvas_MouseDown(object sender, MouseButtonEventArgs e) {
+	private void WaveformOutCanvas_MiddleMouseDown(object sender, MouseButtonEventArgs e) {
 		if (isWaveformMoving == true) // Moving with a released wheel and pressing a button
 			CancelWaveformMoving();
 		if (e.ButtonState == MouseButtonState.Pressed && CursorLine.Visibility == Visibility.Visible) {
@@ -31,7 +31,13 @@ public partial class MainWindow {
 				waveformMoveStartPosition = e.GetPosition(sender as IInputElement);
 				Mouse.OverrideCursor = Cursors.SizeWE;
 				CurrentTimeSlider_MouseLeftButtonDown(null, null);
-			} else if (e.ChangedButton == MouseButton.Left && !isDrawingRangeZone) {
+			}
+		}
+	}
+
+	private void WaveformOutCanvas_LeftMouseDown(object sender, MouseButtonEventArgs e) {
+		if (e.ButtonState == MouseButtonState.Pressed && CursorLine.Visibility == Visibility.Visible) {
+			if (e.ChangedButton == MouseButton.Left && !isDrawingRangeZone) {
 				((UIElement)e.Source).CaptureMouse();
 				isDrawingRangeZone = true;
 				waveformMoveStartPosition = e.GetPosition(sender as IInputElement);
@@ -42,11 +48,19 @@ public partial class MainWindow {
 		}
 	}
 
-	private void WaveformOutCanvas_MouseUp(object sender, MouseButtonEventArgs e) {
-		if (e.ChangedButton is MouseButton.Middle or MouseButton.Left && e.ButtonState == MouseButtonState.Released) {
+	private void WaveformOutCanvas_MiddleMouseUp(object sender, MouseButtonEventArgs e) {
+		if (e.ChangedButton == MouseButton.Middle && e.ButtonState == MouseButtonState.Released) {
 			((UIElement)e.Source).ReleaseMouseCapture();
 			CancelWaveformMoving();
-			if (e.ChangedButton == MouseButton.Left) SubmitCreateRangeZone();
+		}
+	}
+
+	private void WaveformOutCanvas_LeftMouseUp(object sender, MouseButtonEventArgs e) {
+		if (e.ChangedButton == MouseButton.Left && e.ButtonState == MouseButtonState.Released) {
+			((UIElement)e.Source).ReleaseMouseCapture();
+			bool isNotCreateRangeZone = isDeferredMovingStarted;
+			CancelWaveformMoving();
+			if (!isNotCreateRangeZone) SubmitCreateRangeZone();
 		}
 	}
 
@@ -61,7 +75,7 @@ public partial class MainWindow {
 
 	private void SubmitCreateRangeZone() {
 		if (ActiveRangeZone == null) return;
-		if (ActiveRangeZone.ActualWidth < 3) {
+		if (ActiveRangeZone.ActualWidth < 10) {
 			RangeZonesCanvas.Children.Remove(ActiveRangeZone);
 			ActiveRangeZone = null;
 			return;
@@ -88,33 +102,46 @@ public partial class MainWindow {
 		if (e.Side == RangeZone.Side.End) {
 			double offset = e.CurrentPosition - e.StartPosition;
 			rangeZone.Width = Math.Abs(offset);
-			if (offset < 0) // TODO: 鼠标快速移动时另一端会错位。
-				Canvas.SetLeft(rangeZone, e.StartPosition - left + offset);
+			Canvas.SetLeft(rangeZone, e.StartPosition - left + (offset < 0 ? offset : 0));
 		} else {
 			double offset = e.CurrentPosition - e.EndPosition;
 			rangeZone.Width = Math.Abs(offset);
-			if (offset < 0)
-				Canvas.SetLeft(rangeZone, e.EndPosition - left + offset);
+			Canvas.SetLeft(rangeZone, e.EndPosition - left + (offset < 0 ? offset : 0));
 		}
 		UpdateRangeZoneSeconds(rangeZone);
 	}
 
 	private void RefreshRangeZonesCanvas() {
-		RangeZonesCanvas.Children.RemoveRange(0, RangeZonesCanvas.Children.Count);
 		double widthPixel = RangeZonesCanvas.ActualWidth;
+		double startSeconds = Player.Position.TotalSeconds - Duration, endSeconds = Player.Position.TotalSeconds + Duration;
 		foreach (RangeZone rangeZone in rangeZones) {
-			try {
-				RangeZonesCanvas.Children.Add(rangeZone);
-			} catch (Exception) {
+			//Debug.WriteLine($"{rangeZone.StartSeconds} {rangeZone.LengthSeconds}");
+			if (rangeZone.StartSeconds + rangeZone.LengthSeconds <= startSeconds || rangeZone.StartSeconds >= endSeconds) {
+				if (RangeZonesCanvas.Children.Contains(rangeZone))
+					RangeZonesCanvas.Children.Remove(rangeZone);
 				continue;
 			}
+			if (!RangeZonesCanvas.Children.Contains(rangeZone))
+				try {
+					RangeZonesCanvas.Children.Add(rangeZone);
+				} catch (Exception) {
+					continue;
+				}
 			rangeZone.Width = rangeZone.LengthSeconds / (Duration * 2) * widthPixel;
 			Canvas.SetLeft(rangeZone, (rangeZone.StartSeconds - Player.Position.TotalSeconds + Duration) / (Duration * 2) * widthPixel);
 		}
-		// TODO: 优化，仅显示画面可见的范围区域，同时可根据情况显示隐藏，不必把所有控件删除后重新添加。
+		//Debug.WriteLine("");
 	}
 
-	private List<RangeZone> rangeZones = new();
+	private void ClearAllRangeZones() {
+		for (int i = rangeZones.Count - 1; i >= 0; i--) {
+			RangeZone rangeZone = rangeZones[i];
+			rangeZones.RemoveAt(i);
+			RangeZonesCanvas.Children.Remove(rangeZone);
+		}
+	}
+
+	private readonly List<RangeZone> rangeZones = new();
 
 	private RangeZone? activeRangeZone;
 	private RangeZone? ActiveRangeZone {
@@ -129,10 +156,10 @@ public partial class MainWindow {
 		}
 	}
 
-	private bool HasRangeZoneSelected {
+	public bool HasRangeZoneSelected {
 		get => ActiveRangeZone != null;
 		set => OnPropertyChanged(nameof(HasRangeZoneSelected));
-	} // TODO: BUG
+	}
 
 	private void RangeZone_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) =>
 		ActiveRangeZone = sender as RangeZone;
@@ -150,18 +177,16 @@ public partial class MainWindow {
 				if (isDeferredMovingStarted) return;
 				if (previousDeferredMovingStarted && !isDeferredMovingStarted) {
 					ActiveRangeZone = new() {
-						Width = offset.X,
+						Width = Math.Abs(offset.X),
 						Height = RangeZonesCanvas.ActualHeight,
 						IsHitTestVisible = false,
 					};
 					RangeZonesCanvas.Children.Add(ActiveRangeZone);
 					Canvas.SetTop(ActiveRangeZone, 0);
-					Canvas.SetLeft(ActiveRangeZone, waveformMoveStartPosition.Value.X);
 				} else if (ActiveRangeZone != null) {
 					ActiveRangeZone.Width = Math.Abs(offset.X);
-					Canvas.SetLeft(ActiveRangeZone, waveformMoveStartPosition.Value.X + (offset.X < 0 ? offset.X : 0));
 				}
-				// TODO: 当区域宽度太窄时则删除。
+				Canvas.SetLeft(ActiveRangeZone, waveformMoveStartPosition.Value.X + (offset.X < 0 ? offset.X : 0));
 			}
 		}
 	}
