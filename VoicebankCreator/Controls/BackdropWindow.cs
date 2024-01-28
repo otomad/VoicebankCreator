@@ -1,6 +1,5 @@
 using static VoicebankCreator.Interop.PInvoke.ParameterTypes;
 using static VoicebankCreator.Interop.PInvoke.Methods;
-using System.ComponentModel;
 
 namespace VoicebankCreator.Controls;
 

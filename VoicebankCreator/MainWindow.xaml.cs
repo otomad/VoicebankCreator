@@ -1,8 +1,5 @@
 using VoicebankCreator.Controls;
-using NAudio.Wave;
-using System.Windows.Threading;
 using VoicebankCreator.Media;
-using System.Numerics;
 using VoicebankCreator.ViewModels;
 
 namespace VoicebankCreator;

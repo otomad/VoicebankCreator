@@ -70,7 +70,7 @@ namespace VoicebankCreator.Properties {
         }
         
         /// <summary>
-        ///   查找类似 _Open 的本地化字符串。
+        ///   查找类似 Open 的本地化字符串。
         /// </summary>
         public static string OpenButton {
             get {
@@ -79,7 +79,7 @@ namespace VoicebankCreator.Properties {
         }
         
         /// <summary>
-        ///   查找类似 _Pause 的本地化字符串。
+        ///   查找类似 Pause 的本地化字符串。
         /// </summary>
         public static string PauseButton {
             get {
@@ -88,7 +88,7 @@ namespace VoicebankCreator.Properties {
         }
         
         /// <summary>
-        ///   查找类似 _Play 的本地化字符串。
+        ///   查找类似 Play 的本地化字符串。
         /// </summary>
         public static string PlayButton {
             get {
@@ -97,7 +97,7 @@ namespace VoicebankCreator.Properties {
         }
         
         /// <summary>
-        ///   查找类似 _Stop 的本地化字符串。
+        ///   查找类似 Stop 的本地化字符串。
         /// </summary>
         public static string StopButton {
             get {

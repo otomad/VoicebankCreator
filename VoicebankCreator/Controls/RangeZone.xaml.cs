@@ -3,13 +3,19 @@ namespace VoicebankCreator.Controls;
 /// <summary>
 /// RangeZone.xaml 的交互逻辑
 /// </summary>
-public partial class RangeZone : UserControl {
+public partial class RangeZone : UserControl, INotifyPropertyChanged {
 	public RangeZone() {
 		InitializeComponent();
 	}
 
 	public double StartSeconds { get; set; }
 	public double LengthSeconds { get; set; }
+
+	private string text = "";
+	public string Text {
+		get => text;
+		set { text = Regex.Replace(value, @"\s", ""); OnPropertyChanged(nameof(Text)); }
+	}
 
 	public enum Side {
 		Start = -1,
@@ -96,6 +102,7 @@ public partial class RangeZone : UserControl {
 		set {
 			isActive = value;
 			Resources["FillColor"] = isActive ? Color.FromRgb(255, 128, 0) : Color.FromRgb(0, 128, 255);
+			if (!isActive) BlurText();
 		}
 	}
 
@@ -109,5 +116,27 @@ public partial class RangeZone : UserControl {
 
 	private void Delete_OnClick(object sender, RoutedEventArgs e) {
 		RaiseEvent(new RoutedEventArgs(DeleteRoutedEvent, this));
+	}
+
+	public event PropertyChangedEventHandler? PropertyChanged;
+
+	protected virtual void OnPropertyChanged(string propertyName) {
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+	}
+
+	public void FocusText() {
+		TextBox.Focus();
+	}
+
+	public void BlurText() {
+		// Kill logical focus
+		FocusManager.SetFocusedElement(FocusManager.GetFocusScope(TextBox), null);
+		// Kill keyboard focus
+		Keyboard.ClearFocus();
+	}
+
+	private void TextBox_PreviewKeyDown(object sender, KeyEventArgs e) {
+		if (e.Key == Key.Space)
+			e.Handled = true;
 	}
 }

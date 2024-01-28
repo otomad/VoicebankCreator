@@ -1,5 +1,3 @@
-using System.ComponentModel;
-
 namespace VoicebankCreator.ViewModels;
 
 public class ViewModelBase : INotifyPropertyChanged {

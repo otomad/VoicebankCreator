@@ -121,15 +121,15 @@
     <value>Voicebank Creator</value>
   </data>
   <data name="OpenButton" xml:space="preserve">
-    <value>打开(_O)</value>
+    <value>打开</value>
   </data>
   <data name="PauseButton" xml:space="preserve">
-    <value>暂停(_P)</value>
+    <value>暂停</value>
   </data>
   <data name="PlayButton" xml:space="preserve">
-    <value>播放(_P)</value>
+    <value>播放</value>
   </data>
   <data name="StopButton" xml:space="preserve">
-    <value>停止(_S)</value>
+    <value>停止</value>
   </data>
 </root>

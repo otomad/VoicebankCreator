@@ -88,6 +88,7 @@ public partial class MainWindow {
 		UpdateRangeZoneSeconds(ActiveRangeZone);
 		rangeZones.Add(ActiveRangeZone);
 		RefreshRangeZonesCanvas();
+		ActiveRangeZone.FocusText();
 	}
 
 	private void UpdateRangeZoneSeconds(RangeZone rangeZone) {
@@ -167,8 +168,11 @@ public partial class MainWindow {
 			if (activeRangeZone != null)
 				activeRangeZone.IsActive = false;
 			activeRangeZone = value;
-			if (activeRangeZone != null)
+			if (activeRangeZone != null) {
 				activeRangeZone.IsActive = true;
+				if (!isDrawingRangeZone)
+					activeRangeZone.FocusText();
+			}
 			OnPropertyChanged(nameof(HasRangeZoneSelected));
 		}
 	}
