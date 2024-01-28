@@ -82,7 +82,9 @@ public partial class MainWindow {
 		}
 		ActiveRangeZone.IsHitTestVisible = true;
 		ActiveRangeZone.Resize += RangeZone_Resize;
+		ActiveRangeZone.Move += RangeZone_Move;
 		ActiveRangeZone.MouseDown += RangeZone_MouseDown;
+		ActiveRangeZone.Delete += RangeZone_Delete;
 		UpdateRangeZoneSeconds(ActiveRangeZone);
 		rangeZones.Add(ActiveRangeZone);
 		RefreshRangeZonesCanvas();
@@ -109,6 +111,20 @@ public partial class MainWindow {
 			Canvas.SetLeft(rangeZone, e.EndPosition - left + (offset < 0 ? offset : 0));
 		}
 		UpdateRangeZoneSeconds(rangeZone);
+	}
+
+	private void RangeZone_Move(object? sender, RangeZone.RangeZoneMoveEventArgs e) {
+		if (sender is not RangeZone rangeZone) return;
+		if (!RangeZonesCanvas.Children.Contains(rangeZone)) return;
+		Canvas.SetLeft(rangeZone, Canvas.GetLeft(rangeZone) + e.Offset.X);
+		UpdateRangeZoneSeconds(rangeZone);
+	}
+
+	private void RangeZone_Delete(object? sender, RoutedEventArgs? e) {
+		if (sender is not RangeZone rangeZone) return;
+		RangeZonesCanvas.Children.Remove(rangeZone);
+		rangeZones.Remove(rangeZone);
+		if (ActiveRangeZone == rangeZone) ActiveRangeZone = null;
 	}
 
 	private void RefreshRangeZonesCanvas() {
@@ -139,6 +155,7 @@ public partial class MainWindow {
 			rangeZones.RemoveAt(i);
 			RangeZonesCanvas.Children.Remove(rangeZone);
 		}
+		ActiveRangeZone = null;
 	}
 
 	private readonly List<RangeZone> rangeZones = new();
@@ -177,19 +194,42 @@ public partial class MainWindow {
 				bool previousDeferredMovingStarted = isDeferredMovingStarted;
 				if (Math.Abs(offset.X) > 10) isDeferredMovingStarted = false;
 				if (isDeferredMovingStarted) return;
+				SongRangePixel songRange = SongRangePixel;
+				double left = waveformMoveStartPosition.Value.X + (offset.X < 0 ? offset.X : 0);
+				if (songRange.End < waveformMoveStartPosition.Value.X || songRange.Start > waveformMoveStartPosition.Value.X) return;
+				double leftDifference = Math.Max(0, songRange.Start - left);
 				if (previousDeferredMovingStarted && !isDeferredMovingStarted) {
 					ActiveRangeZone = new() {
-						Width = Math.Abs(offset.X),
 						Height = RangeZonesCanvas.ActualHeight,
 						IsHitTestVisible = false,
 					};
 					RangeZonesCanvas.Children.Add(ActiveRangeZone);
 					Canvas.SetTop(ActiveRangeZone, 0);
-				} else if (ActiveRangeZone != null) {
-					ActiveRangeZone.Width = Math.Abs(offset.X);
 				}
-				Canvas.SetLeft(ActiveRangeZone, waveformMoveStartPosition.Value.X + (offset.X < 0 ? offset.X : 0));
+				if (ActiveRangeZone != null) {
+					ActiveRangeZone.Width = Math.Min(Math.Abs(offset.X), songRange.End - left) - leftDifference;
+					Canvas.SetLeft(ActiveRangeZone, Math.Max(left, songRange.Start));
+				}
 			}
 		}
+	}
+
+	private SongRangePixel SongRangePixel {
+		get {
+			double current = Player.Position.TotalSeconds, total = Player.NaturalDuration.TimeSpan.TotalSeconds, toEnd = total - current;
+			double startPixel = WaveformOutCanvas.ActualWidth / 2 - current / (Duration * 2) * WaveformOutCanvas.ActualWidth;
+			double endPixel = WaveformOutCanvas.ActualWidth / 2 + toEnd / (Duration * 2) * WaveformOutCanvas.ActualWidth;
+			return new(startPixel, endPixel);
+		}
+	}
+}
+
+public struct SongRangePixel {
+	public double Start;
+	public double End;
+
+	public SongRangePixel(double start, double end) {
+		Start = start;
+		End = end;
 	}
 }

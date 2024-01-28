@@ -39,7 +39,13 @@
 				MouseDown="Side_MouseDown"
 				MouseMove="Side_MouseMove"
 				MouseUp="Side_MouseUp" />
-			<Rectangle x:Name="Move" Fill="Transparent" Grid.Column="1" />
+			<Rectangle
+				x:Name="MoveRec"
+				Grid.Column="1"
+				Fill="Transparent"
+				MouseDown="Move_MouseDown"
+				MouseMove="Move_MouseMove"
+				MouseUp="Side_MouseUp" />
 			<Rectangle
 				x:Name="End"
 				Grid.Column="2"

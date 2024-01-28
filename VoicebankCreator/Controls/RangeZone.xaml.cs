@@ -19,6 +19,7 @@ public partial class RangeZone : UserControl {
 	private Side? isResizing = null;
 	private Point? startPosition = null;
 	private Point? endPosition = null;
+	private bool isMoving = false;
 
 	private void Side_MouseDown(object sender, MouseButtonEventArgs e) {
 		if (e.ChangedButton == MouseButton.Left && e.ButtonState == MouseButtonState.Pressed && isResizing == null) {
@@ -34,6 +35,7 @@ public partial class RangeZone : UserControl {
 			((UIElement)e.Source).ReleaseMouseCapture();
 			isResizing = null;
 			startPosition = null;
+			isMoving = false;
 		}
 	}
 
@@ -45,9 +47,23 @@ public partial class RangeZone : UserControl {
 		}
 	}
 
-	public Func<RangeZone, Side, double?>? GetAnotherSide { get; set; }
+	private void Move_MouseDown(object sender, MouseButtonEventArgs e) {
+		if (e.ChangedButton == MouseButton.Left && e.ButtonState == MouseButtonState.Pressed && isResizing == null) {
+			isMoving = true;
+			startPosition = e.GetPosition(sender as IInputElement);
+			((UIElement)e.Source).CaptureMouse();
+		}
+	}
 
-	public event EventHandler<RangeZoneResizeEventArgs> Resize = null!;
+	private void Move_MouseMove(object sender, MouseEventArgs e) {
+		if (isMoving && startPosition.HasValue) {
+			Point currentPosition = e.GetPosition(sender as IInputElement);
+			Vector offset = currentPosition - startPosition.Value;
+			Move(this, new(offset));
+		}
+	}
+
+	public event EventHandler<RangeZoneResizeEventArgs> Resize = delegate { };
 
 	public class RangeZoneResizeEventArgs : MouseEventArgs {
 		public Side Side { get; }
@@ -61,6 +77,16 @@ public partial class RangeZone : UserControl {
 			StartPosition = startPosition / dpi;
 			EndPosition = endPosition / dpi;
 			CurrentPosition = currentPosition / dpi;
+		}
+	}
+
+	public event EventHandler<RangeZoneMoveEventArgs> Move = delegate { };
+
+	public class RangeZoneMoveEventArgs : EventArgs {
+		public Vector Offset { get; }
+
+		public RangeZoneMoveEventArgs(Vector offset) {
+			Offset = offset;
 		}
 	}
 

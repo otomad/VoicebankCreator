@@ -195,10 +195,7 @@ public partial class MainWindow : BackdropWindow {
 	}
 
 	private void RemoveSelectedBtn_Click(object? sender, RoutedEventArgs? e) {
-		if (ActiveRangeZone == null) return;
-		RangeZonesCanvas.Children.Remove(ActiveRangeZone);
-		rangeZones.Remove(ActiveRangeZone);
-		ActiveRangeZone = null;
+		RangeZone_Delete(ActiveRangeZone, null);
 	}
 
 	private void Window_Closing(object? sender, System.ComponentModel.CancelEventArgs? e) {
