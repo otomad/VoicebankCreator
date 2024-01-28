@@ -52,7 +52,8 @@ public class AudioPlayer {
 				WaveFormat format = new((int)(wave16.WaveFormat.SampleRate * playbackRate), wave16.WaveFormat.BitsPerSample, wave16.WaveFormat.Channels);
 
 				byte[] buffer = new byte[audio.Length];
-				wave16.Read(buffer, 0, buffer.Length);
+				int length = wave16.Read(buffer, 0, buffer.Length);
+				Array.Resize(ref buffer, length);
 				using RawSourceWaveStream newAudio = new(new MemoryStream(buffer), format);
 				resultAudio = newAudio.ToSampleProvider();
 			}

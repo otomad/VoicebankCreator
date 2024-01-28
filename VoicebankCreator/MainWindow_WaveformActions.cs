@@ -82,7 +82,7 @@ public partial class MainWindow {
 		}
 		ActiveRangeZone.IsHitTestVisible = true;
 		ActiveRangeZone.Resize += RangeZone_Resize;
-		ActiveRangeZone.MouseLeftButtonDown += RangeZone_MouseLeftButtonDown;
+		ActiveRangeZone.MouseDown += RangeZone_MouseDown;
 		UpdateRangeZoneSeconds(ActiveRangeZone);
 		rangeZones.Add(ActiveRangeZone);
 		RefreshRangeZonesCanvas();
@@ -161,8 +161,10 @@ public partial class MainWindow {
 		set => OnPropertyChanged(nameof(HasRangeZoneSelected));
 	}
 
-	private void RangeZone_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) =>
-		ActiveRangeZone = sender as RangeZone;
+	private void RangeZone_MouseDown(object sender, MouseButtonEventArgs e) {
+		if (e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed)
+			ActiveRangeZone = sender as RangeZone;
+	}
 
 	private void WaveformOutCanvas_MouseMove(object sender, MouseEventArgs e) {
 		if (CursorLine.Visibility == Visibility.Visible && waveformMoveStartPosition.HasValue) {

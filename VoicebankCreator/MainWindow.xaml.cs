@@ -194,15 +194,31 @@ public partial class MainWindow : BackdropWindow {
 		IsCurrentTimeSliderChanging = IsCurrentTimeSliderChangingState.NoChanging;
 	}
 
-	private void RemoveSelectedBtn_Click(object sender, RoutedEventArgs e) {
+	private void RemoveSelectedBtn_Click(object? sender, RoutedEventArgs? e) {
 		if (ActiveRangeZone == null) return;
 		RangeZonesCanvas.Children.Remove(ActiveRangeZone);
 		rangeZones.Remove(ActiveRangeZone);
 		ActiveRangeZone = null;
 	}
 
-	private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+	private void Window_Closing(object? sender, System.ComponentModel.CancelEventArgs? e) {
 		StopBtn_Click(null, null);
 		audioPlayer.FilePath = null;
+	}
+
+	private void Window_KeyUp(object? sender, KeyEventArgs e) {
+		Key key = e.Key switch {
+			Key.System => e.SystemKey,
+			Key.ImeProcessed => e.ImeProcessedKey,
+			Key.DeadCharProcessed => e.DeadCharProcessedKey,
+			_ => e.Key,
+		};
+		switch (key) {
+			case Key.Space: PlayBtn_Click(null, null); break;
+			case Key.LeftCtrl: case Key.RightCtrl: PlaySelectedBtn_Click(PlaySelectedBtn, null); break;
+			case Key.LeftAlt: case Key.RightAlt: e.Handled = true; PlaySelectedBtn_Click(PlaySelectedSlowBtn, null); break;
+			case Key.Delete: RemoveSelectedBtn_Click(null, null); break;
+			default: break;
+		}
 	}
 }

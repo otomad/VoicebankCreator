@@ -72,4 +72,16 @@ public partial class RangeZone : UserControl {
 			Resources["FillColor"] = isActive ? Color.FromRgb(255, 128, 0) : Color.FromRgb(0, 128, 255);
 		}
 	}
+
+	private static readonly RoutedEvent DeleteRoutedEvent =
+		EventManager.RegisterRoutedEvent("Delete", RoutingStrategy.Bubble, typeof(EventHandler<RoutedEventArgs>), typeof(RangeZone));
+
+	public event RoutedEventHandler Delete {
+		add => AddHandler(DeleteRoutedEvent, value);
+		remove => RemoveHandler(DeleteRoutedEvent, value);
+	}
+
+	private void Delete_OnClick(object sender, RoutedEventArgs e) {
+		RaiseEvent(new RoutedEventArgs(DeleteRoutedEvent, this));
+	}
 }
