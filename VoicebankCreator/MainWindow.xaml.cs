@@ -1,6 +1,11 @@
+using System.Numerics;
+
 using VoicebankCreator.Controls;
 using VoicebankCreator.Media;
+using VoicebankCreator.Serializables;
 using VoicebankCreator.ViewModels;
+
+using Path = System.IO.Path;
 
 namespace VoicebankCreator;
 
@@ -38,9 +43,9 @@ public partial class MainWindow : BackdropWindow {
 	}
 
 	private void OpenBtn_Click(object? sender, RoutedEventArgs? e) {
-		OpenFileDialog? dialog = new() {
+		OpenFileDialog dialog = new() {
 			Filter = "All supported files|*.yml;*.yaml;*.mp4;*.mov;*.m4v;*.wmv;*.asf;*.avi;*.3g2;*.3gp;*.3gp2;*.3gpp;*.wav;*.aiff;*.mp3;*.wma;*.aac;*.m4a;*.adts;*.flac|" +
-				"YAML files|*.yml;*.yaml|" +
+				"YAML files|*.yaml;*.yml|" +
 				"Video files|*.mp4;*.mov;*.m4v;*.wmv;*.asf;*.avi;*.3g2;*.3gp;*.3gp2;*.3gpp|" +
 				"Audio files|*.wav;*.aiff;*.mp3;*.wma;*.aac;*.m4a;*.adts;*.flac|" +
 				"All files|*.*",
@@ -53,18 +58,19 @@ public partial class MainWindow : BackdropWindow {
 		Player_ShowFrame();
 	}
 
-	private void Player_MediaOpened(object sender, RoutedEventArgs e) {
+	private void Player_MediaOpened(object? sender, RoutedEventArgs? e) {
 		CurrentTimeSlider.Maximum = PlayerDuration;
-		TotalTimeLbl.Text = Player.NaturalDuration.TimeSpan.ToString(TIME_SPAN_FORMAT);
-		Player_ShowFrame();
+		if (Player.NaturalDuration.HasTimeSpan)
+			TotalTimeLbl.Text = Player.NaturalDuration.TimeSpan.ToString(TIME_SPAN_FORMAT);
 		audioPlayer.FilePath = FilePath;
 		DrawWaveform();
 		duration = 2.5;
 		AudioLoaded = true;
+		PlayerRow.Height = Player.HasVideo ? new(1, GridUnitType.Star) : new(0);
 	}
 
 	private void Player_ShowFrame() {
-		Player.Play();
+		Player.Play(); // TODO: 如果打开的是音频文件，加载非常慢，且也不知道在做什么。
 		Player.Pause();
 		UpdateTimeSpan();
 	}
@@ -95,7 +101,6 @@ public partial class MainWindow : BackdropWindow {
 	}
 
 	public void Play() {
-		//audioPlayer.Play(1);
 		Player.Play();
 		IsPlaying = true;
 	}
@@ -139,7 +144,7 @@ public partial class MainWindow : BackdropWindow {
 		}
 	}
 
-	private double PlayerDuration => Player.NaturalDuration.HasTimeSpan ? Player.NaturalDuration.TimeSpan.Seconds : 0;
+	private double PlayerDuration => Player.NaturalDuration.HasTimeSpan ? Player.NaturalDuration.TimeSpan.TotalSeconds : 0;
 
 	private double duration = 2.5;
 	public double Duration {
@@ -214,5 +219,21 @@ public partial class MainWindow : BackdropWindow {
 			case Key.Delete: RemoveSelectedBtn_Click(null, null); break;
 			default: break;
 		}
+	}
+
+	private void Player_MediaFailed(object sender, ExceptionRoutedEventArgs e) {
+		Debug.WriteLine(e.ErrorException);
+	}
+
+	private void SaveBtn_Click(object sender, RoutedEventArgs e) {
+		if (FilePath == null) return;
+		string fileName = Path.GetFileName(Path.ChangeExtension(FilePath, ".yaml"));
+		SaveFileDialog dialog = new() {
+			FileName = fileName,
+			Filter = "YAML files|*.yaml;*.yml",
+		};
+		if (dialog.ShowDialog() != true) return;
+		string yamlPath = dialog.FileName;
+		Voicebank.ToYaml(new Voicebank(FilePath, rangeZones), yamlPath);
 	}
 }

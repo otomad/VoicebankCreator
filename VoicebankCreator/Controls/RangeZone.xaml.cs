@@ -3,7 +3,7 @@ namespace VoicebankCreator.Controls;
 /// <summary>
 /// RangeZone.xaml 的交互逻辑
 /// </summary>
-public partial class RangeZone : UserControl, INotifyPropertyChanged {
+public partial class RangeZone : UserControl {
 	public RangeZone() {
 		InitializeComponent();
 	}
@@ -11,10 +11,11 @@ public partial class RangeZone : UserControl, INotifyPropertyChanged {
 	public double StartSeconds { get; set; }
 	public double LengthSeconds { get; set; }
 
-	private string text = "";
+	private static string RemoveWhitespace(string text) => Regex.Replace(text, @"\s", "");
+
 	public string Text {
-		get => text;
-		set { text = Regex.Replace(value, @"\s", ""); OnPropertyChanged(nameof(Text)); }
+		get => RemoveWhitespace(TextBox.Text);
+		set => TextBox.Text = RemoveWhitespace(value);
 	}
 
 	public enum Side {
@@ -116,12 +117,6 @@ public partial class RangeZone : UserControl, INotifyPropertyChanged {
 
 	private void Delete_OnClick(object sender, RoutedEventArgs e) {
 		RaiseEvent(new RoutedEventArgs(DeleteRoutedEvent, this));
-	}
-
-	public event PropertyChangedEventHandler? PropertyChanged;
-
-	protected virtual void OnPropertyChanged(string propertyName) {
-		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 
 	public void FocusText() {

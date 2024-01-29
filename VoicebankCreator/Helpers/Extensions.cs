@@ -1,5 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Imaging;
-using System.IO;
 
 using NAudio.Wave;
 
@@ -25,6 +25,7 @@ internal static class Extensions {
 		waveStream.Seek(0, SeekOrigin.Begin);
 	}
 
+	[return: NotNullIfNotNull("mediaColor")]
 	public static System.Drawing.Color? ToDrawingColor(this Color? mediaColor) =>
 		mediaColor == null ? null :
 			System.Drawing.Color.FromArgb(mediaColor.Value.A, mediaColor.Value.R, mediaColor.Value.G, mediaColor.Value.B);

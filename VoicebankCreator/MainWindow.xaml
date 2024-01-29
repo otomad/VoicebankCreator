@@ -29,7 +29,7 @@
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
-			<RowDefinition Height="*" />
+			<RowDefinition x:Name="PlayerRow" Height="*" />
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="100" />
 		</Grid.RowDefinitions>
@@ -45,6 +45,11 @@
 					Click="OpenBtn_Click"
 					Icon="&#xe8e5;"
 					Text="{x:Static p:Resources.OpenButton}" />
+				<c:ToolBarButton
+					x:Name="SaveBtn"
+					Click="SaveBtn_Click"
+					Icon="&#xe74e;"
+					Text="保存" />
 				<Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
 				<c:ToolBarButton
 					x:Name="PlayBtn"
@@ -81,6 +86,7 @@
 			Name="Player"
 			Grid.Row="1"
 			LoadedBehavior="Manual"
+			UnloadedBehavior="Close"
 			MediaEnded="Player_MediaEnded"
 			MediaOpened="Player_MediaOpened"
 			ScrubbingEnabled="True"
