@@ -1,0 +1,10 @@
+[requires]
+yaml-cpp/0.8.0
+boolinq/3.0.4
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[layout]
+cmake_layout
