@@ -4,7 +4,7 @@ project(VoicebankCreator VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick Multimedia)
+find_package(Qt6 REQUIRED COMPONENTS Quick Multimedia yaml-cpp boolinq)
 
 qt_standard_project_setup(REQUIRES 6.5)
 
@@ -17,7 +17,8 @@ qt_add_qml_module(appVoicebankCreator
 	VERSION 1.0
 	QML_FILES
 	Main.qml
-	RESOURCES conanfile.txt
+	RESOURCES
+	RESOURCES vcpkg.json
 	QML_FILES Controls/PlayerToolBar.qml
 	SOURCES mediaformatprovider.h mediaformatprovider.cpp
 	SOURCES includes.h
@@ -37,6 +38,8 @@ WIN32_EXECUTABLE TRUE
 target_link_libraries(appVoicebankCreator PRIVATE
 	Qt6::Quick
 	Qt6::Multimedia
+	yaml-cpp
+	boolinq
 )
 
 # target_link_libraries(MediaPlayerApp PRIVATE

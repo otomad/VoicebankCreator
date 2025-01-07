@@ -10,6 +10,6 @@
 #include <QMediaFormat>
 #include <QMimeType>
 #include <QStringBuilder>
-// #include "boolinq/boolinq.h"
+#include "boolinq/boolinq.h"
 
 #endif // INCLUDES_H
