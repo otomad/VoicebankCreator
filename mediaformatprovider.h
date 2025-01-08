@@ -6,7 +6,7 @@
 typedef QMediaFormat::FileFormat FileFormat;
 
 namespace VoicebankCreator {
-	static QStringList getNameFilters();
+	QStringList getNameFilters();
 }
 
 #endif // MEDIAFORMATPROVIDER_H
