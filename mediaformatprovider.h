@@ -5,7 +5,7 @@
 
 typedef QMediaFormat::FileFormat FileFormat;
 
-namespace VoicebankCreator {
+namespace VoicebankCreator { Q_NAMESPACE
 	QStringList getNameFilters();
 }
 

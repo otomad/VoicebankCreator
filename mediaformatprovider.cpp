@@ -6,6 +6,10 @@ static QString concatNameFilter(QString description, QStringList suffixes) {
 	return QString("%1 (%2)").arg(description, suffixes.join(' '));
 }
 
+// Cannot use Qt build-in tr function in global function directly.
+// see: https://stackoverflow.com/questions/64774242/qt5-tr-macro-does-not-translate-text
+static inline auto tr(const char *sourceText) { return QCoreApplication::translate("VoicebankCreator", sourceText); }
+
 QStringList VoicebankCreator::getNameFilters() {
 	QStringList result;
 	QList<FileFormat> formats = QMediaFormat().supportedFileFormats(QMediaFormat::Decode);
@@ -28,8 +32,8 @@ QStringList VoicebankCreator::getNameFilters() {
 			result += concatNameFilter(description, suffixes);
 		}
 	}
-	result.prepend(concatNameFilter("Audio Files", audioSuffixes));
-	result.prepend(concatNameFilter("Video Files", videoSuffixes));
-	result.prepend(concatNameFilter("All Supported Files", allSuffixes));
+	result.prepend(concatNameFilter(tr("Audio Files"), audioSuffixes));
+	result.prepend(concatNameFilter(tr("Video Files"), videoSuffixes));
+	result.prepend(concatNameFilter(tr("All Supported Files"), allSuffixes));
 	return result;
 }

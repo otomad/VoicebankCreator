@@ -6,33 +6,54 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick Multimedia)
+find_package(Qt6 REQUIRED COMPONENTS Quick Multimedia LinguistTools)
 
-qt_standard_project_setup(REQUIRES 6.5)
+qt_standard_project_setup(REQUIRES 6.5
+	I18N_TRANSLATED_LANGUAGES zh_CN
+)
 
 qt_add_executable(VoicebankCreator
 	main.cpp
+)
+
+qt_add_translations(VoicebankCreator
+	TS_FILE_BASE VoicebankCreator
+	TS_FILE_DIR Translations
 )
 
 if (QT_KNOWN_POLICY_QTP0004)
 	qt_policy(SET QTP0004 NEW)
 endif ()
 
+set_source_files_properties(Constants.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
+set_source_files_properties(Components/Images.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
+
 qt_add_qml_module(VoicebankCreator
 	URI VoicebankCreator
 	VERSION 1.0
-	QML_FILES Main.qml
-	QML_FILES Controls/PlayerToolBar.qml
-	SOURCES mediaformatprovider.h mediaformatprovider.cpp
-	SOURCES includes.h
-	SOURCES boolinq.h
+	QML_FILES
+		Main.qml
+		Constants.qml
+		Components/PlayerToolBar.qml
+		Components/PlayerPreview.qml
+		Components/PlayerToolButton.qml
+		Components/PlayerPlaybackButton.qml
+		Components/Images.qml
+	SOURCES
+		mediaformatprovider.h mediaformatprovider.cpp
+		includes.h
+		boolinq.h
+	RESOURCES
+		Icons/open.svg
+		Icons/pause.svg
+		Icons/play.svg
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
 set_target_properties(VoicebankCreator PROPERTIES
-	# MACOSX_BUNDLE_GUI_IDENTIFIER com.example.VoicebankCreator
+	MACOSX_BUNDLE_GUI_IDENTIFIER com.github.otomad.VoicebankCreator
 	MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
 	MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
 	MACOSX_BUNDLE TRUE

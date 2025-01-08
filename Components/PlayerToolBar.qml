@@ -1,26 +1,29 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Controls.FluentWinUI3
 import QtQuick.Dialogs
+import ".."
 
 Item {
 	id: root
 
 	signal fileOpened(path: url)
 
+	required property list<string> nameFilters
+
 	ToolBar {
 		anchors.fill: parent
 
-		ToolButton {
-			text: qsTr("打开")
+		PlayerToolButton {
+			text: qsTr("Open")
+			iconName: "open"
 			onClicked: fileDialog.open()
 		}
 	}
 
 	FileDialog {
 		id: fileDialog
-		title: qsTr("选择文件")
-		nameFilters: []
+		title: qsTr("Select a file")
+		nameFilters: root.nameFilters
 		onAccepted: root.fileOpened(fileDialog.selectedFile)
 	}
 }
