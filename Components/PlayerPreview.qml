@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import QtMultimedia
 
 Item {
@@ -36,48 +37,64 @@ Item {
 		}
 	}
 
-	Item { // TODO: ColumnLayout
+	RowLayout {
 		id: playbackControl
 		anchors.left: parent.left
 		anchors.right: parent.right
 		anchors.bottom: parent.bottom
 		anchors.margins: 4
-		height: childrenRect.height
+		anchors.rightMargin: 12
+		spacing: 0
+		// height: childrenRect.height
 
-		PlayerPlaybackButton {
-			id: playBtn
-			// icon.source: mediaPlayer.playing ? Images.iconSource("pause") : Images.iconSource("play")
-			iconName: mediaPlayer.playing ? "pause" : "play"
-			anchors.left: parent.left
-			enabled: mediaPlayer.seekable
-			onClicked: root.togglePlaying()
+		Row {
+			Layout.rightMargin: 4
+
+			PlayerPlaybackButton {
+				id: playBtn
+				iconName: mediaPlayer.playing ? "pause" : "play"
+				enabled: mediaPlayer.seekable
+				onClicked: root.togglePlaying()
+			}
+
+			PlayerPlaybackButton {
+				id: volumeBtn
+				smaller: true
+				iconName:
+					mediaPlayer.audioOutput.muted ? "mute" :
+					mediaPlayer.audioOutput.volume === 0 ? "volume0" :
+					mediaPlayer.audioOutput.volume <= 1 / 3 ? "volume1" :
+					mediaPlayer.audioOutput.volume <= 2 / 3 ? "volume2" : "volume3"
+				enabled: mediaPlayer.seekable
+			}
+
+			PlayerPlaybackButton {
+				id: rateBtn
+				smaller: true
+				iconName:
+					mediaPlayer.playbackRate === 1 ? "speed_medium" :
+					mediaPlayer.playbackRate < 1 ? "speed_low" : "speed_high"
+				enabled: mediaPlayer.seekable
+			}
 		}
 
 		Label {
 			id: currentTime
 			text: root.getTime(mediaPlayer.position)
-			anchors.left: playBtn.right
-			anchors.margins: 10
-			anchors.verticalCenter: parent.verticalCenter
 		}
 
 		Slider {
 			id: seeker
-			anchors.left: currentTime.right
-			anchors.right: durationTime.left
-			anchors.verticalCenter: parent.verticalCenter
 			enabled: mediaPlayer.seekable
 			to: 1.0
 			value: mediaPlayer.position / mediaPlayer.duration
+			Layout.fillWidth: true
 			onMoved: mediaPlayer.setPosition(value * mediaPlayer.duration)
 		}
 
 		Label {
 			id: durationTime
 			text: root.getTime(mediaPlayer.duration)
-			anchors.right: parent.right
-			anchors.margins: currentTime.anchors.margins
-			anchors.verticalCenter: parent.verticalCenter
 		}
 	}
 

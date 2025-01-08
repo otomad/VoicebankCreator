@@ -47,6 +47,14 @@ qt_add_qml_module(VoicebankCreator
 		Icons/open.svg
 		Icons/pause.svg
 		Icons/play.svg
+		Icons/speed_low.svg
+		Icons/speed_medium.svg
+		Icons/speed_high.svg
+		Icons/volume0.svg
+		Icons/volume1.svg
+		Icons/volume2.svg
+		Icons/volume3.svg
+		Icons/mute.svg
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
