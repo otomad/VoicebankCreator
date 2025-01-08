@@ -5,11 +5,14 @@ import QtQuick.Dialogs
 import QtMultimedia
 
 Window {
+	id: root
 	width: 640
 	height: 480
 	visible: true
-	color: "#EAEAEA"
+	color: "black" // "#EAEAEA"
 	title: qsTr("Voicebank Creator")
+
+	required property list<string> nameFilters
 
 	Column {
 		ToolBar {
@@ -24,6 +27,7 @@ Window {
 		FileDialog {
 			id: fileDialog
 			title: qsTr("选择文件")
+			nameFilters: root.nameFilters
 			onAccepted: {
 				mediaPlayer.source = fileDialog.selectedFile;
 				console.log(fileDialog.selectedFile);

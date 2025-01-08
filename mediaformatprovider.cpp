@@ -1,10 +1,15 @@
 #include "mediaformatprovider.h"
 
-static inline bool isAudioFormat(FileFormat format) { return format < QMediaFormat::Mpeg4Audio; }
+static inline bool isAudioFormat(FileFormat format) { return format >= QMediaFormat::Mpeg4Audio; }
+
+static QString concatNameFilter(QString description, QStringList suffixes) {
+	return QString("%1 (%2)").arg(description, suffixes.join(' '));
+}
 
 QStringList VoicebankCreator::getNameFilters() {
 	QStringList result;
-	const QList<FileFormat> formats = QMediaFormat().supportedFileFormats(QMediaFormat::Decode);
+	QList<FileFormat> formats = QMediaFormat().supportedFileFormats(QMediaFormat::Decode);
+	std::sort(formats.begin(), formats.end());
 	QStringList audioSuffixes, videoSuffixes, allSuffixes;
 	for (qsizetype i = 0, size = formats.size(); i < size; i++) {
 		const FileFormat format = formats.at(i);
@@ -17,12 +22,14 @@ QStringList VoicebankCreator::getNameFilters() {
 				suffixes[i] = "*." + suffixes[i];
 			allSuffixes += suffixes;
 			*generalSuffixes += suffixes;
-			const QString description = QMediaFormat::fileFormatDescription(format);
-			result += description + " (" + suffixes.join(' ') + ")";
+			QString description = QMediaFormat::fileFormatDescription(format);
+			// Rename "Wave File" to "Wave Files" to match the name of other filter items.
+			if (description.endsWith(" File", Qt::CaseInsensitive)) description += 's';
+			result += concatNameFilter(description, suffixes);
 		}
 	}
-	result.prepend((QString)"Audio Files" + " (" + audioSuffixes.join(' ') + ")");
-	result.prepend((QString)"Video Files" + " (" + videoSuffixes.join(' ') + ")");
-	result.prepend((QString)"All Supported Files" + " (" + allSuffixes.join(' ') + ")");
+	result.prepend(concatNameFilter("Audio Files", audioSuffixes));
+	result.prepend(concatNameFilter("Video Files", videoSuffixes));
+	result.prepend(concatNameFilter("All Supported Files", allSuffixes));
 	return result;
 }
