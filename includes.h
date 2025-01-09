@@ -12,6 +12,7 @@
 #include <QStringBuilder>
 #include <QTranslator>
 #include <QFont>
+#include <QIcon>
 // #include "boolinq.h"
 
 // /**
