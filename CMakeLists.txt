@@ -27,6 +27,7 @@ endif ()
 
 set_source_files_properties(Constants.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
 set_source_files_properties(Components/Images.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
+set_source_files_properties(Components/PlayerSliderPopupSingletonService.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
 
 qt_add_qml_module(VoicebankCreator
 	URI VoicebankCreator
@@ -40,6 +41,8 @@ qt_add_qml_module(VoicebankCreator
 		Components/PlayerPlaybackButton.qml
 		Components/Images.qml
 		Components/ErrorPopup.qml
+		Components/PlayerSliderPopup.qml
+		Components/PlayerSliderPopupSingletonService.qml
 	SOURCES
 		mediaformatprovider.h mediaformatprovider.cpp
 		includes.h
@@ -56,6 +59,7 @@ qt_add_qml_module(VoicebankCreator
 		Icons/volume2.svg
 		Icons/volume3.svg
 		Icons/mute.svg
+		Icons/error.svg
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -104,4 +108,14 @@ install(TARGETS VoicebankCreator
 	BUNDLE DESTINATION .
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+get_target_property(qmake_exec_filepath Qt6::qmake IMPORTED_LOCATION)
+get_filename_component(qt_exec_bin_dir "${qmake_exec_filepath}" DIRECTORY)
+find_program(windeployqt_exec_filepath windeployqt HINTS "${qt_exec_bin_dir}")
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+	COMMAND "${CMAKE_COMMAND}" -E
+	env PATH="${qt_exec_bin_dir}" "${windeployqt_exec_filepath}"
+	"$<TARGET_FILE:${PROJECT_NAME}>"
+	COMMENT "Running windeployqt..."
 )

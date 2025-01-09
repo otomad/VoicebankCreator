@@ -11,6 +11,8 @@ Item {
 	QtObject {
 		id: internal
 		property bool isVideoLoaded: mediaPlayer.seekable
+		property string displayPlaybackRate: root.getDisplayPlaybackRate(mediaPlayer.playbackRate)
+		property string displayVolume: root.getDisplayVolume(audio.volume)
 	}
 
 	ColumnLayout {
@@ -19,11 +21,9 @@ Item {
 
 		MediaPlayer {
 			id: mediaPlayer
-			// playbackRate: playbackControl.playbackRate
 			videoOutput: videoOutput
 			audioOutput: AudioOutput {
 				id: audio
-				// volume: playbackControl.volume
 			}
 
 			onErrorOccurred: {
@@ -46,46 +46,28 @@ Item {
 		RowLayout {
 			id: playbackControl
 			Layout.margins: 4
-			Layout.rightMargin: 12
 			Layout.fillWidth: true
 			spacing: 0
-			// height: childrenRect.height
+
+			readonly property double playbackButtonMargin: 4;
 
 			Row {
-				Layout.rightMargin: 4
+				Layout.rightMargin: playbackControl.playbackButtonMargin
 
 				PlayerPlaybackButton {
 					id: playBtn
+					tooltip: mediaPlayer.playing ? qsTr("Pause") : qsTr("Play")
 					iconName: mediaPlayer.playing ? "pause" : "play"
 					enabled: internal.isVideoLoaded
 					onClicked: root.togglePlaying()
-				}
-
-				PlayerPlaybackButton {
-					id: volumeBtn
-					smaller: true
-					iconName:
-						mediaPlayer.audioOutput.muted ? "mute" :
-						mediaPlayer.audioOutput.volume === 0 ? "volume0" :
-						mediaPlayer.audioOutput.volume <= 1 / 3 ? "volume1" :
-						mediaPlayer.audioOutput.volume <= 2 / 3 ? "volume2" : "volume3"
-					enabled: internal.isVideoLoaded
-				}
-
-				PlayerPlaybackButton {
-					id: rateBtn
-					smaller: true
-					iconName:
-						mediaPlayer.playbackRate === 1 ? "speed_medium" :
-						mediaPlayer.playbackRate < 1 ? "speed_low" : "speed_high"
-					enabled: internal.isVideoLoaded
 				}
 			}
 
 			Label {
 				id: currentTime
-				text: root.getTime(mediaPlayer.position)
+				text: root.getDisplayTime(mediaPlayer.position)
 				enabled: internal.isVideoLoaded
+				font.features: { "tnum": 1 }
 			}
 
 			Slider {
@@ -94,19 +76,74 @@ Item {
 				to: 1.0
 				value: mediaPlayer.position / mediaPlayer.duration
 				Layout.fillWidth: true
-				onMoved: mediaPlayer.setPosition(value * mediaPlayer.duration)
+				onMoved: mediaPlayer.position = value * mediaPlayer.duration
 			}
 
 			Label {
 				id: durationTime
-				text: root.getTime(mediaPlayer.duration)
+				text: root.getDisplayTime(mediaPlayer.duration)
 				enabled: internal.isVideoLoaded
+				font.features: currentTime.font.features
+			}
+
+			Row {
+				Layout.leftMargin: playbackControl.playbackButtonMargin
+
+				PlayerPlaybackButton {
+					id: rateBtn
+					smaller: true
+					tooltip: qsTr("Playback Rate: ") + internal.displayPlaybackRate
+					iconName:
+						mediaPlayer.playbackRate === 1 ? "speed_medium" :
+						mediaPlayer.playbackRate < 1 ? "speed_low" : "speed_high"
+					enabled: internal.isVideoLoaded
+					popupItem: ratePopup
+					onClicked: mediaPlayer.playbackRate = 1
+				}
+
+				PlayerPlaybackButton {
+					id: volumeBtn
+					smaller: true
+					tooltip: qsTr("Volume: ") + (audio.muted ? qsTr("Muted") : internal.displayVolume)
+					iconName:
+						audio.muted ? "mute" :
+						audio.volume === 0 ? "volume0" :
+						audio.volume <= 1 / 3 ? "volume1" :
+						audio.volume <= 2 / 3 ? "volume2" : "volume3"
+					enabled: internal.isVideoLoaded
+					popupItem: volumePopup
+					onClicked: audio.muted = !audio.muted
+				}
 			}
 		}
 	}
 
 	ErrorPopup {
 		id: errorPopup
+	}
+
+	PlayerSliderPopup {
+		id: volumePopup
+		targetItem: volumeBtn
+		displayValue: internal.displayVolume
+		value: audio.volume
+		strikeoutValue: audio.muted
+		defaultValue: 1
+		onMoved: {
+			audio.muted = false;
+			audio.volume = value;
+		}
+	}
+
+	PlayerSliderPopup {
+		id: ratePopup
+		targetItem: rateBtn
+		displayValue: internal.displayPlaybackRate
+		from: -2
+		to: 2
+		value: Math.log2(mediaPlayer.playbackRate)
+		defaultValue: 0
+		onMoved: mediaPlayer.playbackRate = 2 ** value
 	}
 
 	function play() {
@@ -126,10 +163,18 @@ Item {
 		else mediaPlayer.play();
 	}
 
-	function getTime(time: int): string {
+	function getDisplayTime(time: int): string {
 		const h = Math.floor(time / 3600000).toString();
 		const m = Math.floor(time / 60000).toString();
 		const s = Math.floor(time / 1000 - m * 60).toString();
 		return `${h.padStart(2, "0")}:${m.padStart(2, "0")}:${s.padStart(2, "0")}`;
+	}
+
+	function getDisplayPlaybackRate(value: double): string {
+		return value.toFixed(2).replace(/\.?0+$/, "") + "×";
+	}
+
+	function getDisplayVolume(value: double): string {
+		return (value * 100).toFixed(0) + "%";
 	}
 }

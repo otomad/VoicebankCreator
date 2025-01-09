@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include "mediaformatprovider.h"
+#include <QFontDatabase>
 
 using namespace VoicebankCreator;
 
@@ -12,6 +13,10 @@ int main(int argc, char *argv[]) {
 	QTranslator translator;
 	if (translator.load(appName + "_" + locale + ".qm"))
 		QCoreApplication::installTranslator(&translator);
+
+	// QFont font("Microsoft YaHei", 14);
+	// app.setFont(font);
+	// QFontDatabase::setApplicationFallbackFontFamilies(QChar::Script_Common, QStringList("Microsoft YaHei"));
 
 	QQmlApplicationEngine engine;
 	QObject::connect(

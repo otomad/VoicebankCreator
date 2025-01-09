@@ -12,14 +12,42 @@
 <context>
     <name>ErrorPopup</name>
     <message>
-        <location filename="../Components/ErrorPopup.qml" line="34"/>
+        <location filename="../Components/ErrorPopup.qml" line="39"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="../Components/ErrorPopup.qml" line="46"/>
+        <location filename="../Components/ErrorPopup.qml" line="51"/>
         <source>OK</source>
         <translation>确定</translation>
+    </message>
+</context>
+<context>
+    <name>PlayerPreview</name>
+    <message>
+        <location filename="../Components/PlayerPreview.qml" line="59"/>
+        <source>Pause</source>
+        <translation>暂停</translation>
+    </message>
+    <message>
+        <location filename="../Components/PlayerPreview.qml" line="59"/>
+        <source>Play</source>
+        <translation>播放</translation>
+    </message>
+    <message>
+        <location filename="../Components/PlayerPreview.qml" line="95"/>
+        <source>Playback Rate: </source>
+        <translation>速度：</translation>
+    </message>
+    <message>
+        <location filename="../Components/PlayerPreview.qml" line="107"/>
+        <source>Volume: </source>
+        <translation>音量：</translation>
+    </message>
+    <message>
+        <location filename="../Components/PlayerPreview.qml" line="107"/>
+        <source>Muted</source>
+        <translation>静音</translation>
     </message>
 </context>
 <context>
