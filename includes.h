@@ -11,6 +11,7 @@
 #include <QMimeType>
 #include <QStringBuilder>
 #include <QTranslator>
+#include <QFont>
 // #include "boolinq.h"
 
 // /**

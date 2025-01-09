@@ -39,6 +39,7 @@ qt_add_qml_module(VoicebankCreator
 		Components/PlayerToolButton.qml
 		Components/PlayerPlaybackButton.qml
 		Components/Images.qml
+		Components/ErrorPopup.qml
 	SOURCES
 		mediaformatprovider.h mediaformatprovider.cpp
 		includes.h

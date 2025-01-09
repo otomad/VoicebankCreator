@@ -10,14 +10,27 @@
     </message>
 </context>
 <context>
+    <name>ErrorPopup</name>
+    <message>
+        <location filename="../Components/ErrorPopup.qml" line="34"/>
+        <source>Error</source>
+        <translation>错误</translation>
+    </message>
+    <message>
+        <location filename="../Components/ErrorPopup.qml" line="46"/>
+        <source>OK</source>
+        <translation>确定</translation>
+    </message>
+</context>
+<context>
     <name>PlayerToolBar</name>
     <message>
-        <location filename="../Components/PlayerToolBar.qml" line="17"/>
+        <location filename="../Components/PlayerToolBar.qml" line="18"/>
         <source>Open</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="../Components/PlayerToolBar.qml" line="25"/>
+        <location filename="../Components/PlayerToolBar.qml" line="26"/>
         <source>Select a file</source>
         <translation>选择文件</translation>
     </message>

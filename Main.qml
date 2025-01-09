@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Layouts
 import QtQuick.Controls.FluentWinUI3
 import "Components"
 
@@ -15,27 +16,27 @@ Window {
 		anchors.fill: parent
 		padding: 0
 
-		PlayerToolBar {
-			id: toolBar
+		ColumnLayout {
+			anchors.fill: parent
+			spacing: 0
 
-			width: parent.width
-			height: 50
+			PlayerToolBar {
+				id: toolBar
+				Layout.fillWidth: true
+				Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+				Layout.preferredHeight: 58
+				nameFilters: root.nameFilters
+				onFileOpened: path => {
+					playerPreview.source = path;
+					playerPreview.play();
+				}
+			}
 
-			nameFilters: root.nameFilters
-			onFileOpened: path => {
-				playerPreview.source = path;
-				playerPreview.play();
+			PlayerPreview {
+				id: playerPreview
+				Layout.fillWidth: true
+				Layout.fillHeight: true
 			}
 		}
-
-		PlayerPreview {
-			id: playerPreview
-
-			anchors.top: toolBar.bottom
-			anchors.bottom: parent.bottom
-			anchors.left: parent.left
-			anchors.right: parent.right
-		}
 	}
-
 }

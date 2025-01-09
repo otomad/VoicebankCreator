@@ -1,16 +1,17 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
-import ".."
 
 Item {
 	id: root
+	// height: toolBar.childrenRect.height
 
 	signal fileOpened(path: url)
 
-	required property list<string> nameFilters
+	property alias nameFilters: fileDialog.nameFilters
 
 	ToolBar {
+		id: toolBar
 		anchors.fill: parent
 
 		PlayerToolButton {
