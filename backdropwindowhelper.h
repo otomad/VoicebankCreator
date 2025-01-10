@@ -39,6 +39,9 @@ enum class SystemBackdropType : unsigned int {
 	TabbedWindow,
 };
 
+/**
+ * @brief The ColorScheme enum add "Auto" enumurator to the Qt::ColorScheme.
+ */
 enum class ColorScheme : const int {
 	Unknown,
 	Light,

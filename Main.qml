@@ -29,6 +29,10 @@ Window {
 			anchors.fill: parent
 			spacing: 0
 
+			// Label {
+			// 	text: "测试Testㄘㄜㄕテストてすと테스트اختبارการทดสอบ"
+			// }
+
 			PlayerToolBar {
 				id: toolBar
 				Layout.fillWidth: true
