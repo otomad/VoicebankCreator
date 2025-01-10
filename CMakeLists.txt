@@ -48,6 +48,7 @@ qt_add_qml_module(VoicebankCreator
 		mediaformatprovider.h mediaformatprovider.cpp
 		includes.h
 		boolinq.h
+		backdropwindowhelper.h backdropwindowhelper.cpp
 	RESOURCES
 		Icons/open.svg
 		Icons/pause.svg

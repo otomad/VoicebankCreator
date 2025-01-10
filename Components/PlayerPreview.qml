@@ -13,6 +13,7 @@ Item {
 		property bool isVideoLoaded: mediaPlayer.seekable
 		property string displayPlaybackRate: root.getDisplayPlaybackRate(mediaPlayer.playbackRate)
 		property string displayVolume: root.getDisplayVolume(audio.volume)
+		property bool notCompact: root.width >= 400
 	}
 
 	ColumnLayout {
@@ -67,6 +68,7 @@ Item {
 				id: currentTime
 				text: root.getDisplayTime(mediaPlayer.position)
 				enabled: internal.isVideoLoaded
+				visible: internal.notCompact
 				font.features: { "tnum": 1 }
 			}
 
@@ -83,11 +85,13 @@ Item {
 				id: durationTime
 				text: root.getDisplayTime(mediaPlayer.duration)
 				enabled: internal.isVideoLoaded
+				visible: internal.notCompact
 				font.features: currentTime.font.features
 			}
 
 			Row {
 				Layout.leftMargin: playbackControl.playbackButtonMargin
+				visible: internal.notCompact
 
 				PlayerPlaybackButton {
 					id: rateBtn

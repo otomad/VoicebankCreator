@@ -13,6 +13,7 @@ Item {
 	ToolBar {
 		id: toolBar
 		anchors.fill: parent
+		anchors.topMargin: -16
 
 		PlayerToolButton {
 			text: qsTr("Open")

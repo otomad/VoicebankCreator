@@ -13,6 +13,7 @@
 #include <QTranslator>
 #include <QFont>
 #include <QIcon>
+#include <QQuickWindow>
 // #include "boolinq.h"
 
 // /**

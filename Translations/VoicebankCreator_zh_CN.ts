@@ -25,27 +25,27 @@
 <context>
     <name>PlayerPreview</name>
     <message>
-        <location filename="../Components/PlayerPreview.qml" line="59"/>
+        <location filename="../Components/PlayerPreview.qml" line="60"/>
         <source>Pause</source>
         <translation>暂停</translation>
     </message>
     <message>
-        <location filename="../Components/PlayerPreview.qml" line="59"/>
+        <location filename="../Components/PlayerPreview.qml" line="60"/>
         <source>Play</source>
         <translation>播放</translation>
     </message>
     <message>
-        <location filename="../Components/PlayerPreview.qml" line="95"/>
+        <location filename="../Components/PlayerPreview.qml" line="99"/>
         <source>Playback Rate: </source>
         <translation>速度：</translation>
     </message>
     <message>
-        <location filename="../Components/PlayerPreview.qml" line="107"/>
+        <location filename="../Components/PlayerPreview.qml" line="111"/>
         <source>Volume: </source>
         <translation>音量：</translation>
     </message>
     <message>
-        <location filename="../Components/PlayerPreview.qml" line="107"/>
+        <location filename="../Components/PlayerPreview.qml" line="111"/>
         <source>Muted</source>
         <translation>静音</translation>
     </message>
@@ -53,12 +53,12 @@
 <context>
     <name>PlayerToolBar</name>
     <message>
-        <location filename="../Components/PlayerToolBar.qml" line="18"/>
+        <location filename="../Components/PlayerToolBar.qml" line="19"/>
         <source>Open</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="../Components/PlayerToolBar.qml" line="26"/>
+        <location filename="../Components/PlayerToolBar.qml" line="27"/>
         <source>Select a file</source>
         <translation>选择文件</translation>
     </message>
