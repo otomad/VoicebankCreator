@@ -4,9 +4,8 @@
 <context>
     <name>Constants</name>
     <message>
-        <location filename="../Constants.qml" line="7"/>
         <source>Segoe UI</source>
-        <translation>Microsoft YaHei</translation>
+        <translation type="vanished">Microsoft YaHei</translation>
     </message>
 </context>
 <context>

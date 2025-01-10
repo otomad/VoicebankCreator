@@ -7,5 +7,4 @@ ToolButton {
 
 	icon.source: Images.iconSource(iconName)
 	anchors.verticalCenter: parent.verticalCenter
-	font.family: Constants.fontFamily
 }

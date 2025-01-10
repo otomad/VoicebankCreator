@@ -18,7 +18,6 @@ ToolButton {
 	width: smaller ? height * 0.85 : height
 	icon.height: height
 	icon.width: height
-	font.family: Constants.fontFamily
 	hoverEnabled: true
 	ToolTip.visible: enabled && hovered && !popupItem?.hovered
 	ToolTip.text: tooltip
