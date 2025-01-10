@@ -79,6 +79,11 @@ target_link_libraries(VoicebankCreator PRIVATE
 	Qt6::Multimedia
 )
 
+target_link_libraries(VoicebankCreator PRIVATE
+	user32.lib
+	dwmapi.lib
+)
+
 # target_link_libraries(MediaPlayerApp PRIVATE
 # 	Qt6::Core
 # 	Qt6::Svg

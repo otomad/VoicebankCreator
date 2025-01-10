@@ -10,12 +10,20 @@ Window {
 	height: 720
 	visible: true
 	title: Constants.appDisplayName
+	color: "transparent"
+	// flags: Qt.FramelessWindowHint
 
 	required property list<string> nameFilters
+	property bool paneVisible: true
 
 	Pane {
 		anchors.fill: parent
 		padding: 0
+		visible: root.paneVisible
+	}
+
+	Item {
+		anchors.fill: parent
 
 		ColumnLayout {
 			anchors.fill: parent
