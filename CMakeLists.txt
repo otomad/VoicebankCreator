@@ -49,6 +49,7 @@ qt_add_qml_module(${PROJECT_NAME}
 		includes.h
 		boolinq.h
 		backdropwindowhelper.h backdropwindowhelper.cpp
+		audiopreview.h audiopreview.cpp
 	RESOURCES
 		Icons/open.svg
 		Icons/pause.svg

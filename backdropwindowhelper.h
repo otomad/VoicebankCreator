@@ -61,6 +61,8 @@ class BackdropWindowHelper : QObject {
 		void setBackdrop(SystemBackdropType backdrop);
 		void setColorScheme(ColorScheme colorScheme);
 		void setColorScheme(Qt::ColorScheme colorScheme);
+
+	public slots:
 		void onColorSchemeChanged(Qt::ColorScheme colorScheme);
 
 	private:

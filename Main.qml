@@ -3,6 +3,7 @@ import QtQuick.Window
 import QtQuick.Layouts
 import QtQuick.Controls.FluentWinUI3
 import "Components"
+import VoicebankCreator.AudioPreview
 
 Window {
 	id: root
@@ -42,6 +43,7 @@ Window {
 				onFileOpened: path => {
 					playerPreview.source = path;
 					playerPreview.play();
+					audioPreview.url = path;
 				}
 			}
 
@@ -49,6 +51,10 @@ Window {
 				id: playerPreview
 				Layout.fillWidth: true
 				Layout.fillHeight: true
+			}
+
+			AudioPreview {
+				id: audioPreview
 			}
 		}
 	}

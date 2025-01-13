@@ -3,10 +3,16 @@
 #include "backdropwindowhelper.h"
 #include <QLibraryInfo>
 #include <QFontDatabase>
+#include <QtMultimedia>
+#include "audiopreview.h"
 
 using namespace VoicebankCreator;
 
 int main(int argc, char *argv[]) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
+
 	QGuiApplication app(argc, argv);
 	QString appName = app.applicationName();
 	QString locale = QLocale::system().name();
@@ -22,6 +28,8 @@ int main(int argc, char *argv[]) {
 	QFontDatabase::addApplicationFallbackFontFamily(QChar::Script_Katakana, "Yu Gothic UI");
 	QFontDatabase::addApplicationFallbackFontFamily(QChar::Script_Hangul, "Malgun Gothic");
 #endif
+
+	qmlRegisterType<AudioPreview>("VoicebankCreator.AudioPreview", 1, 0, "AudioPreview");
 
 	QQmlApplicationEngine engine;
 	QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
