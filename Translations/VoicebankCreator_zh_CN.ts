@@ -52,12 +52,12 @@
 <context>
     <name>PlayerToolBar</name>
     <message>
-        <location filename="../Components/PlayerToolBar.qml" line="19"/>
+        <location filename="../Components/PlayerToolBar.qml" line="22"/>
         <source>Open</source>
         <translation>打开</translation>
     </message>
     <message>
-        <location filename="../Components/PlayerToolBar.qml" line="27"/>
+        <location filename="../Components/PlayerToolBar.qml" line="30"/>
         <source>Select a file</source>
         <translation>选择文件</translation>
     </message>

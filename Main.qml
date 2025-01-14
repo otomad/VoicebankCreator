@@ -12,10 +12,10 @@ Window {
 	visible: true
 	title: Constants.appDisplayName
 	color: "transparent"
-	// flags: Qt.FramelessWindowHint
 
 	required property list<string> nameFilters
 	property bool paneVisible: true
+	property bool darkTheme: Application.styleHints.colorScheme === Qt.ColorScheme.Dark
 
 	Pane {
 		anchors.fill: parent
@@ -38,7 +38,7 @@ Window {
 				id: toolBar
 				Layout.fillWidth: true
 				Layout.alignment: Qt.AlignLeft | Qt.AlignTop
-				Layout.preferredHeight: 58
+				Layout.preferredHeight: 48
 				nameFilters: root.nameFilters
 				onFileOpened: path => {
 					playerPreview.source = path;
@@ -55,6 +55,9 @@ Window {
 
 			AudioPreview {
 				id: audioPreview
+				Layout.fillWidth: true
+				height: 200
+				color: root.darkTheme ? "white" : "black";
 			}
 		}
 	}

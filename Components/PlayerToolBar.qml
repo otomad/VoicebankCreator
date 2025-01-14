@@ -13,7 +13,10 @@ Item {
 	ToolBar {
 		id: toolBar
 		anchors.fill: parent
-		anchors.topMargin: -16
+		// anchors.topMargin: margin
+		// anchors.bottomMargin: margin
+
+		// readonly property double margin: -64
 
 		PlayerToolButton {
 			text: qsTr("Open")
