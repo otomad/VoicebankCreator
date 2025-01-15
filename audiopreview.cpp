@@ -119,19 +119,35 @@ void AudioPreview::paint(QPainter *painter) {
 	painter->setRenderHint(QPainter::SmoothPixmapTransform);
 	QSizeF itemSize = size();
 	qreal halfHeight = itemSize.height() / 2;
-	qreal dpi = window()->screen()->devicePixelRatio();
+	qreal dpi = 1; // window()->screen()->devicePixelRatio();
 	qreal width_double = itemSize.width() * dpi;
 	// NOTE: halfHeight represents half of the height, while width_double represents the width in the double type.
 	qsizetype width = width_double;
-	QPointF points[width];
+	// QPointF maxPoints[width + 2], minPoints[width + 2];
 	for (qsizetype i = 0; i < width; i++) {
 		qsizetype x = i / width_double * samples.count();
-		qreal y = samples[x];
+		// qreal y = samples[x];
 		// painter->drawRect(i, halfHeight, 1, halfHeight * y);
 		// painter->drawLine(i, halfHeight, i, halfHeight + halfHeight * y);
-		points[i] = QPointF(i / dpi, halfHeight + halfHeight * y);
+
+		qsizetype xNext = qMin((qsizetype)((i + 1) / width_double * samples.count()), samples.count() - 1);
+		qreal yMax = samples[x], yMin = samples[x];
+		for (int xi = x + 1; xi < xNext; xi++) {
+			qreal yi = samples[xi];
+			if (yi > yMax) yMax = yi;
+			if (yi < yMin) yMin = yi;
+		}
+
+		// maxPoints[i] = QPointF(i / dpi, halfHeight + halfHeight * yMax);
+		// minPoints[i] = QPointF(i / dpi, halfHeight + halfHeight * yMin);
+		// painter->drawLine(i / dpi, halfHeight, i / dpi, halfHeight + halfHeight * yMax);
+		// painter->drawLine(i / dpi, halfHeight, i / dpi, halfHeight + halfHeight * yMin);
+		painter->drawLine(i / dpi, halfHeight * (1 + yMin), i / dpi, halfHeight * (1 + yMax));
 	}
-	painter->drawPolygon(points, width);
+	// maxPoints[width] = minPoints[width] = QPointF(width / dpi, halfHeight);
+	// maxPoints[width + 1] = minPoints[width + 1] = QPointF(0, halfHeight);
+	// painter->drawPolygon(maxPoints, width + 2);
+	// painter->drawPolygon(minPoints, width + 2);
 }
 
 /**
