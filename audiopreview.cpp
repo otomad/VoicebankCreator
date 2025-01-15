@@ -22,9 +22,12 @@ AudioPreview::AudioPreview(QQuickItem *parent) : QQuickPaintedItem(parent) {
 AudioPreview::~AudioPreview() { }
 
 void AudioPreview::setUrl(QString url) {
+	if (this->url == url) return;
+
 	QUrl source(url);
 	samples.clear();
 	// samples->squeeze();
+	clear();
 	decoder->setSource(source);
 	decoder->start();
 	peak = 0;
@@ -32,7 +35,10 @@ void AudioPreview::setUrl(QString url) {
 	this->url = url;
 }
 
+static const float MAX_PROGRESS = 1;
+
 void AudioPreview::onBufferReady() {
+	setLoadingProgress(decoder->position() / (double)decoder->duration() * MAX_PROGRESS);
 	QAudioBuffer buffer = decoder->read();
 	if (!buffer.isValid()) {
 		qWarning() << "Invalid audio buffer!";
@@ -85,6 +91,7 @@ void AudioPreview::onDecodingFinished() {
 	// audioSink->stop();
 	// qDebug() << "Finish!!!";
 	if (samples.empty()) return;
+	setLoadingProgress(MAX_PROGRESS);
 	// qDebug() << samples.count() / 44100;
 	// for (qsizetype i = 0; i < samples.count(); i++)
 	// 	if (samples[i] != 0) {
@@ -101,16 +108,39 @@ void AudioPreview::onDecodingError(QAudioDecoder::Error error) {
 }
 
 void AudioPreview::paint(QPainter *painter) {
+	painter->setCompositionMode(QPainter::CompositionMode_Source);
+	if (loadingProgress <= 0) {
+		// painter->eraseRect(0, 0, width(), height());
+		painter->fillRect(0, 0, width(), height(), QBrush(QColor(Qt::transparent)));
+		return;
+	}
 	if (samples.empty()) return;
-	QBrush brush(color);
-	painter->setBrush(brush);
-	painter->setPen(Qt::NoPen);
-	painter->setRenderHint(QPainter::Antialiasing);
+	painter->setBrush(QBrush(color));
+	painter->setPen(color);
+	painter->setRenderHint(QPainter::SmoothPixmapTransform);
 	QSizeF itemSize = size();
 	qreal halfHeight = itemSize.height() / 2;
 	for (qreal i = 0; i < itemSize.width(); i++) {
 		qsizetype x = i / itemSize.width() * samples.count();
 		qreal y = samples[x];
-		painter->drawRect(i, halfHeight, 1, halfHeight * y);
+		// painter->drawRect(i, halfHeight, 1, halfHeight * y);
+		painter->drawLine(i, halfHeight, i, halfHeight + halfHeight * y);
 	}
+}
+
+/**
+ * @brief Clear paint elements.
+ */
+void AudioPreview::clear() {
+	setLoadingProgress(-1);
+	update();
+}
+
+void AudioPreview::setLoadingProgress(float value) {
+	if (value < 0) value = -1;
+	else if (value > 1) value = 1;
+	const int ACCURATE_TO = 100; // Update the loadingProgressChanged slot every 0.01 (100^-1).
+	if ((int)(loadingProgress * ACCURATE_TO) == (int)(value * ACCURATE_TO)) return;
+	loadingProgress = value;
+	loadingProgressChanged(value);
 }

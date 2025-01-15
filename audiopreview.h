@@ -10,6 +10,7 @@ class AudioPreview : public QQuickPaintedItem {
 		QML_ELEMENT
 		Q_PROPERTY(QString url READ getUrl WRITE setUrl /*NOTIFY urlChanged*/)
 		Q_PROPERTY(QColor color READ getColor WRITE setColor)
+		Q_PROPERTY(float loadingProgress READ getLoadingProgress NOTIFY loadingProgressChanged)
 
 	public:
 		AudioPreview(QQuickItem *parent = NULL);
@@ -20,7 +21,9 @@ class AudioPreview : public QQuickPaintedItem {
 		void setUrl(QString url);
 
 		inline QColor getColor() const { return color; }
-		void setColor(QColor color) { this->color = color; update(); }
+		inline void setColor(QColor color) { this->color = color; update(); }
+
+		inline float getLoadingProgress() const { return loadingProgress; }
 
 	private:
 		QString url;
@@ -29,6 +32,9 @@ class AudioPreview : public QQuickPaintedItem {
 		qreal getPeakValue(const QAudioFormat &format);
 		qreal peak;
 		QColor color;
+		float loadingProgress = -1;
+		void setLoadingProgress(float value);
+		void clear();
 
 	protected slots:
 		void onBufferReady();
@@ -37,6 +43,7 @@ class AudioPreview : public QQuickPaintedItem {
 
 	signals:
 		// void urlChanged(const QString &newUrl);
+		void loadingProgressChanged(const float loadingProgress);
 };
 
 #endif // AUDIOPREVIEW_H

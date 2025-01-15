@@ -53,11 +53,24 @@ Window {
 				Layout.fillHeight: true
 			}
 
-			AudioPreview {
-				id: audioPreview
+			Item {
+				id: _item
 				Layout.fillWidth: true
-				height: 200
-				color: root.darkTheme ? "white" : "black";
+				Layout.preferredHeight: 200
+
+				AudioPreview { // AudioPreview PaintedItem
+					id: audioPreview
+					anchors.fill: parent
+					color: root.darkTheme ? "white" : "black";
+				}
+
+				ProgressBar {
+					id: progressBar
+					value: audioPreview.loadingProgress
+					width: parent.width * 0.75
+					anchors.centerIn: parent
+					visible: audioPreview.loadingProgress >= 0 && audioPreview.loadingProgress < 1
+				}
 			}
 		}
 	}
