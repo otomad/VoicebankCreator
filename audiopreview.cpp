@@ -110,7 +110,6 @@ void AudioPreview::onDecodingError(QAudioDecoder::Error error) {
 void AudioPreview::paint(QPainter *painter) {
 	painter->setCompositionMode(QPainter::CompositionMode_Source);
 	if (loadingProgress <= 0) {
-		// painter->eraseRect(0, 0, width(), height());
 		painter->fillRect(0, 0, width(), height(), QBrush(QColor(Qt::transparent)));
 		return;
 	}
@@ -120,12 +119,19 @@ void AudioPreview::paint(QPainter *painter) {
 	painter->setRenderHint(QPainter::SmoothPixmapTransform);
 	QSizeF itemSize = size();
 	qreal halfHeight = itemSize.height() / 2;
-	for (qreal i = 0; i < itemSize.width(); i++) {
-		qsizetype x = i / itemSize.width() * samples.count();
+	qreal dpi = window()->screen()->devicePixelRatio();
+	qreal width_double = itemSize.width() * dpi;
+	// NOTE: halfHeight represents half of the height, while width_double represents the width in the double type.
+	qsizetype width = width_double;
+	QPointF points[width];
+	for (qsizetype i = 0; i < width; i++) {
+		qsizetype x = i / width_double * samples.count();
 		qreal y = samples[x];
 		// painter->drawRect(i, halfHeight, 1, halfHeight * y);
-		painter->drawLine(i, halfHeight, i, halfHeight + halfHeight * y);
+		// painter->drawLine(i, halfHeight, i, halfHeight + halfHeight * y);
+		points[i] = QPointF(i / dpi, halfHeight + halfHeight * y);
 	}
+	painter->drawPolygon(points, width);
 }
 
 /**
