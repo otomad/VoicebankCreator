@@ -119,7 +119,7 @@ void AudioPreview::paint(QPainter *painter) {
 	painter->setRenderHint(QPainter::SmoothPixmapTransform);
 	QSizeF itemSize = size();
 	qreal halfHeight = itemSize.height() / 2;
-	qreal dpi = 1; // window()->screen()->devicePixelRatio();
+	const qreal dpi = 1; // window()->screen()->devicePixelRatio();
 	qreal width_double = itemSize.width() * dpi;
 	// NOTE: halfHeight represents half of the height, while width_double represents the width in the double type.
 	qsizetype width = width_double;
@@ -131,12 +131,14 @@ void AudioPreview::paint(QPainter *painter) {
 		// painter->drawLine(i, halfHeight, i, halfHeight + halfHeight * y);
 
 		qsizetype xNext = qMin((qsizetype)((i + 1) / width_double * samples.count()), samples.count() - 1);
-		qreal yMax = samples[x], yMin = samples[x];
-		for (int xi = x + 1; xi < xNext; xi++) {
-			qreal yi = samples[xi];
-			if (yi > yMax) yMax = yi;
-			if (yi < yMin) yMin = yi;
-		}
+		// qreal yMax = samples[x], yMin = samples[x];
+		// for (int xi = x + 1; xi < xNext; xi++) {
+		// 	qreal yi = samples[xi];
+		// 	if (yi > yMax) yMax = yi;
+		// 	if (yi < yMin) yMin = yi;
+		// }
+		qreal yMax = *std::max_element(samples.begin() + x, samples.begin() + xNext),
+			yMin = *std::min_element(samples.begin() + x, samples.begin() + xNext);
 
 		// maxPoints[i] = QPointF(i / dpi, halfHeight + halfHeight * yMax);
 		// minPoints[i] = QPointF(i / dpi, halfHeight + halfHeight * yMin);
