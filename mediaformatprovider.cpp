@@ -15,17 +15,16 @@ QStringList VoicebankCreator::getNameFilters() {
 	QList<FileFormat> formats = QMediaFormat().supportedFileFormats(QMediaFormat::Decode);
 	std::sort(formats.begin(), formats.end());
 	QStringList audioSuffixes, videoSuffixes, allSuffixes;
-	for (qsizetype i = 0, size = formats.size(); i < size; i++) {
-		const FileFormat format = formats.at(i);
+	for (const FileFormat format : formats) {
 		QMediaFormat mediaFormat(format);
-		QStringList* generalSuffixes = isAudioFormat(format) ? &audioSuffixes : &videoSuffixes;
+		QStringList &generalSuffixes = isAudioFormat(format) ? audioSuffixes : videoSuffixes;
 		const QMimeType mimeType = mediaFormat.mimeType();
 		if (mimeType.isValid()) {
 			QStringList suffixes = mimeType.suffixes();
-			for (qsizetype i = 0, size = suffixes.size(); i < size; i++)
-				suffixes[i] = "*." + suffixes[i];
+			for (QString &suffix : suffixes)
+				suffix = "*." + suffix;
 			allSuffixes += suffixes;
-			*generalSuffixes += suffixes;
+			generalSuffixes += suffixes;
 			QString description = QMediaFormat::fileFormatDescription(format);
 			// Rename "Wave File" to "Wave Files" to match the name of other filter items.
 			if (description.endsWith(" File", Qt::CaseInsensitive)) description += 's';

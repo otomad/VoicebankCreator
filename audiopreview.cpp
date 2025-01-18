@@ -113,7 +113,7 @@ void AudioPreview::paint(QPainter *painter) {
 		painter->fillRect(0, 0, width(), height(), QBrush(QColor(Qt::transparent)));
 		return;
 	}
-	if (samples.empty()) return;
+	if (samples.empty() || loadingProgress < 1) return;
 	painter->setBrush(QBrush(color));
 	painter->setPen(color);
 	painter->setRenderHint(QPainter::SmoothPixmapTransform);
@@ -139,6 +139,11 @@ void AudioPreview::paint(QPainter *painter) {
 		// }
 		qreal yMax = *std::max_element(samples.begin() + x, samples.begin() + xNext),
 			yMin = *std::min_element(samples.begin() + x, samples.begin() + xNext);
+		// qreal yMax = std::numeric_limits<qreal>::lowest(), yMin = std::numeric_limits<qreal>::max();
+		// for (QList<qreal>::iterator yi = samples.begin() + x; yi < samples.begin() + xNext; yi++) {
+		// 	if (*yi > yMax) yMax = *yi;
+		// 	if (*yi < yMin) yMin = *yi;
+		// }
 
 		// maxPoints[i] = QPointF(i / dpi, halfHeight + halfHeight * yMax);
 		// minPoints[i] = QPointF(i / dpi, halfHeight + halfHeight * yMin);

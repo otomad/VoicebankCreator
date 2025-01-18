@@ -65,17 +65,17 @@
 <context>
     <name>VoicebankCreator</name>
     <message>
-        <location filename="../mediaformatprovider.cpp" line="35"/>
+        <location filename="../mediaformatprovider.cpp" line="34"/>
         <source>Audio Files</source>
         <translation>音频文件</translation>
     </message>
     <message>
-        <location filename="../mediaformatprovider.cpp" line="36"/>
+        <location filename="../mediaformatprovider.cpp" line="35"/>
         <source>Video Files</source>
         <translation>视频文件</translation>
     </message>
     <message>
-        <location filename="../mediaformatprovider.cpp" line="37"/>
+        <location filename="../mediaformatprovider.cpp" line="36"/>
         <source>All Supported Files</source>
         <translation>所有支持的文件</translation>
     </message>
